@@ -39,7 +39,7 @@ vignettes/*.pdf
 .Renviron
 
 # Bird data
-csbirds_rawdata_20220120.xlsx
+.csbirds_rawdata_20220120.xlsx
 
 # Insect data
-proctorinsect_rawdata_20220120.xlsx
+.proctorinsect_rawdata_20220120.xlsx
