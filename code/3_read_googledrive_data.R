@@ -1,16 +1,16 @@
 #!/usr/bin/env Rscript --vanilla
 
-#-----------------------------------------------------------------#
-####            Inputing Raw Data from Google Drive            ####
-#-----------------------------------------------------------------#
-
-
-#Packages required
+#------------------------------------------------#
+####           Packages Required              ####
+#------------------------------------------------#
 require(readxl)
 require(tidyverse)
 require(googledrive)
-require(lubridate)
 
+
+#-----------------------------------------------------------------#
+####      Inputing Historical Raw Data from Google Drive       ####
+#-----------------------------------------------------------------#
 
 #First we need to create a function that returns the file name of the most recent version 
 #of the historical bird and insect data sets
@@ -28,6 +28,7 @@ insect.his.newest <- function(x) {
 }
 
 
+#Change WD to put download data into the 'data' folder
 setwd(paste0(getwd(), "/data"))
 
 ##INSECTS
@@ -43,5 +44,6 @@ drive_download((drive_find(pattern = 'csbirds_rawdata', n_max=1)), overwrite = T
 bird.his.ALL <- read_excel(bird.his.newest(bird))
 
 #Return working directory to main folder
-setwd("/Users/Kylelima/Desktop/Landscape_of_Change/landscape_of_change")
-
+wd <- getwd()
+wdr <- gsub("/data", "", wd)
+setwd(wdr)

@@ -1,18 +1,36 @@
 #!/usr/bin/env Rscript --vanilla
 
 #------------------------------------------------#
+####           Packages Required              ####
+#------------------------------------------------#
+require(dplyr)
+require(lubridate)
+require(raster)
+require(sf)
+require(rgdal)
+
+
+#------------------------------------------------#
 ####    Manipulation of Modern Insect Data    ####
 #------------------------------------------------#
 
 #Gather columns of interest and only pull insect species data from 2021
-insect.mod <- insect.mod.ALL[,c('class', 'order', 'family', 'genus', 'specificEpithet',
-                                'verbatimScientificName', 'taxonRank', 'year', 'month', 'day',
-                                'verbatimLocality', 'decimalLatitude', 'decimalLongitude',
-                                'coordinateUncertaintyInMeters')] %>%
-  subset(year==2021 & class=='Insecta' & taxonRank=='SPECIES') %>% 
-  rename('specific.epithet'='specificEpithet', 'current.scientific.name'='verbatimScientificName', 
-         'taxon.rank'='taxonRank', 'location'='verbatimLocality', 'latitude'='decimalLatitude',
-         'longitude'='decimalLongitude', 'coord.uncert.m'='coordinateUncertaintyInMeters')
+apidae.mod <- apidae[,c('latitude', 'longitude', 'id', 'scientific_name', 'common_name', 'place_guess',
+                        'observed_on')] %>%
+  rename('scientific.name'='scientific_name', 'common.name'='common_name', 'place.guess'='place_guess',
+         'observed.on'='observed_on')
+
+#apidae.filter <- apidae.mod[,c(1:3)] %>% 
+#  rename('x'='latitude', 'y'='longitude', 'z'='id')
+
+#r_obj <- raster(xmn=-180, xmx=180, ymn=-90, ymx=90, resolution=c(5,5))
+
+#r_data <- rasterize(apidae.filter[, 1:2], r_obj, apidae.filter[, 3], fun=mean) 
+
+#Filter out observations based kml file of LOC area
+#loc <- readOGR("MDI_Circle.kml")
+#apidae.mod.rast <- rasterFromXYZ(apidae.filter)
+#apidae.cl <- crop(loc, apidae.filter)
 
 #Combine the separated date columns into one
 insect.mod$date = paste(insect.mod$year, insect.mod$month, insect.mod$day, sep="-")
