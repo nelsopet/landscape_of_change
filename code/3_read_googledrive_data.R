@@ -28,14 +28,20 @@ insect.his.newest <- function(x) {
 }
 
 
+setwd(paste0(getwd(), "/data"))
+
 ##INSECTS
 #Insect data from Proctor 1800s
 drive_download((drive_find(pattern = 'proctorinsect_rawdata', n_max=1)), overwrite = TRUE)
 lep.his.ALL <- read_excel(insect.his.newest(insect), sheet = 1)
 api.his.ALL <- read_excel(insect.his.newest(insect), sheet = 2)
 
+
 ##BIRDS
 #Bird data from 1880s Champlain Society, Spelman, etc.
 drive_download((drive_find(pattern = 'csbirds_rawdata', n_max=1)), overwrite = TRUE)
 bird.his.ALL <- read_excel(bird.his.newest(bird))
+
+#Return working directory to main folder
+setwd("/Users/Kylelima/Desktop/Landscape_of_Change/landscape_of_change")
 
