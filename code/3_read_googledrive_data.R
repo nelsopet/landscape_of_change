@@ -45,5 +45,4 @@ bird.his.ALL <- read_excel(bird.his.newest(bird))
 
 #Return working directory to main folder
 wd <- getwd()
-wdr <- gsub("/data", "", wd)
-setwd(wdr)
+setwd(gsub("/data", "", wd))
