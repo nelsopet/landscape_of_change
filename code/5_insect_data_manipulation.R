@@ -1,36 +1,74 @@
 #!/usr/bin/env Rscript --vanilla
 
 #------------------------------------------------#
+####           Packages Required              ####
+#------------------------------------------------#
+require(dplyr)
+require(lubridate)
+
+
+#------------------------------------------------#
 ####    Manipulation of Modern Insect Data    ####
 #------------------------------------------------#
 
-#Gather columns of interest and only pull insect species data from 2021
-insect.mod <- insect.mod.ALL[,c('class', 'order', 'family', 'genus', 'specificEpithet',
-                                'verbatimScientificName', 'taxonRank', 'year', 'month', 'day',
-                                'verbatimLocality', 'decimalLatitude', 'decimalLongitude',
-                                'coordinateUncertaintyInMeters')] %>%
-  subset(year==2021 & class=='Insecta' & taxonRank=='SPECIES') %>% 
-  rename('specific.epithet'='specificEpithet', 'current.scientific.name'='verbatimScientificName', 
-         'taxon.rank'='taxonRank', 'location'='verbatimLocality', 'latitude'='decimalLatitude',
-         'longitude'='decimalLongitude', 'coord.uncert.m'='coordinateUncertaintyInMeters')
+###Cleaning and organizing
+##Apidae
+#Gather columns of interest and rename columns
+api.mod <- api.mod.ALL[,c('latitude', 'longitude', 'id', 'scientific_name', 'common_name', 'place_guess',
+                        'observed_on')] %>%
+  rename('scientific.name'='scientific_name', 'common.name'='common_name', 'locality'='place_guess',
+         'date'='observed_on') %>% 
+  dplyr::select('common.name','scientific.name','date','locality')
 
-#Combine the separated date columns into one
-insect.mod$date = paste(insect.mod$year, insect.mod$month, insect.mod$day, sep="-")
+#Fix dates
+api.mod[c('year', 'trash')] <- str_split_fixed(api.mod$date, '-', 2)
 
-#Subset dataframe to remove points of locality with error >5 miles, and grab only Lepidoptera and Apidae
-insect.mod.v2 <- select(insect.mod, c('order', 'family', 'genus', 'specific.epithet', 'current.scientific.name', 
-                                      'date', 'location', 'latitude', 'longitude', 'coord.uncert.m')) %>% 
-  subset(coord.uncert.m<8047) %>% 
-  subset(order=="Lepidoptera" | family=="Apidae")
+#Clean up after date manipulation
+api.mod.v2 <- dplyr::select(api.mod, -c('date','trash')) %>% 
+  dplyr::select('common.name','scientific.name','year','locality')
 
-unique(insect.mod.v2$current.scientific.name)
-unique(ih.species.list$current.scientific.name)
+#Add column for taxa
+api.rn <- nrow(api.mod.v2)
+api.taxa <- as.data.frame(rep("Apidae", times = api.rn))
 
-#Take the Hancock county wide data and narrow to our defined geographic study area
+#Cbind together
+api.mod.v3 <- cbind(api.mod.v2, api.taxa) %>% 
+  rename('taxonomy'='rep(\"Apidae\", times = api.rn)') %>% 
+  dplyr::select('common.name','scientific.name','taxonomy','year','locality')
 
 
+##Lepidoptera
+#Gather columns of interest and rename columns
+lep.mod <- lep.mod.ALL[,c('latitude', 'longitude', 'id', 'scientific_name', 'common_name', 'place_guess',
+                          'observed_on')] %>%
+  rename('scientific.name'='scientific_name', 'common.name'='common_name', 'locality'='place_guess',
+         'date'='observed_on') %>% 
+  dplyr::select('common.name','scientific.name','date','locality')
+
+#Fix dates
+lep.mod[c('year', 'trash')] <- str_split_fixed(lep.mod$date, '-', 2)
+
+#Clean up after date manipulation
+lep.mod.v2 <- dplyr::select(lep.mod, -c('date','trash')) %>% 
+  dplyr::select('common.name','scientific.name','year','locality')
+
+#Add column for taxa
+lep.rn <- nrow(lep.mod.v2)
+lep.taxa <- as.data.frame(rep("Lepidoptera", times = lep.rn))
+
+#Cbind together
+lep.mod.v3 <- cbind(lep.mod.v2, lep.taxa) %>% 
+  rename('taxonomy'='rep(\"Lepidoptera\", times = lep.rn)') %>% 
+  dplyr::select('common.name','scientific.name','taxonomy','year','locality')
+
+
+##Create one data sheet with all our modern insect data
+#Rbind these two dataframes
+insect.mod <- rbind(lep.mod.v3, api.mod.v3)
+
+##Species list
 #Create a species list from this dataframe
-#im.species.list <- insect.mod[!duplicated(insect.mod$current.scientific.name), ]
+im.species.list <- insect.mod[!duplicated(insect.mod$scientific.name), ]
 
 
 
@@ -43,28 +81,49 @@ lep.his <- lep.his.ALL[,c('Class', 'ORDER', 'Super Family', 'FAMILY', 'Species N
                           'Synonymy/Other Names', 'Locations', 'Notes', 'ALL VOUCHERS')] %>% 
   rename('class'='Class', 'order'='ORDER', 'super.family'='Super Family', 'family'='FAMILY',
          'scientific.name'='Species Name & authority', 'name.synonyms'='Synonymy/Other Names', 
-         'location'='Locations', 'notes'='Notes', 'vouchers'='ALL VOUCHERS')
+         'locality'='Locations', 'notes'='Notes', 'vouchers'='ALL VOUCHERS')
 
 api.his <- api.his.ALL[,c('Class', 'ORDER', 'Super Family', 'FAMILY', 'Species Name & authority', 
                           'Synonymy/Other Names', 'Locations', 'Notes', 'ALL VOUCHERS')] %>% 
   rename('class'='Class', 'order'='ORDER', 'super.family'='Super Family', 'family'='FAMILY',
          'scientific.name'='Species Name & authority', 'name.synonyms'='Synonymy/Other Names', 
-         'location'='Locations', 'notes'='Notes', 'vouchers'='ALL VOUCHERS')
+         'locality'='Locations', 'notes'='Notes', 'vouchers'='ALL VOUCHERS')
 
 #make this one data set of lepidoptera and apidae
 insect.his.ALL <- rbind(lep.his, api.his)
 
 #Split the species name and authority column to get species names by themselves
 insect.his.ALL[c('genus', 'specific.epithet', 'trash')] <- str_split_fixed(insect.his.ALL$scientific.name, ' ', 3)
-insect.his.ALL$current.scientific.name = paste(insect.his.ALL$genus, insect.his.ALL$specific.epithet, sep=" ")
+insect.his.ALL$scientific.name = paste(insect.his.ALL$genus, insect.his.ALL$specific.epithet, sep=" ")
 
 #Reoder and remove uneeded columns
-insect.his <- select(insect.his.ALL, -c('class', 'scientific.name', 'trash')) %>% 
-  select(c('order', 'super.family', 'family', 'genus', 'specific.epithet',
-           'current.scientific.name', everything()))
+insect.his <- dplyr::select(insect.his.ALL, -c('class', 'trash', 'notes', 'vouchers')) %>% 
+  dplyr::select(c('order', 'super.family', 'family', 'genus', 'scientific.name', everything()))
 
+#Create species list
 ih.species.list <- subset(insect.his, insect.his$specific.epithet!="sp.")
+ih.species.list2 <- ih.species.list[!duplicated(ih.species.list$scientific.name), ] %>% 
+  dplyr::select(-c('specific.epithet'))
 
+
+
+#------------------------------------------------#
+####  Adding Taxonomy to Modern Insect Data   ####
+#------------------------------------------------#
+
+##Add taxonomy
+#Split column to make a genus column
+im.species.list[c('genus', 'trash')] <- str_split_fixed(im.species.list$scientific.name, ' ', 2)
+
+#Merge with taxonomy from the historic dataset and clean
+im.species.list2 <- merge(im.species.list, ih.species.list2, by = "scientific.name", all.x = TRUE) %>% 
+  dplyr::select(-c('taxonomy','trash','genus.y','name.synonyms','locality.y')) %>% 
+  dplyr::select('order','super.family','family','genus.x','scientific.name', everything())
+
+
+im.species.list2$order[is.na(im.species.list2$order)] <- im.species.list2$order[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$order))]
+im.species.list2$super.family[is.na(im.species.list2$super.family)] <- im.species.list2$super.family[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$super.family))]
+im.species.list2$family[is.na(im.species.list2$family)] <- im.species.list2$family[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$family))]
 
 
 
@@ -76,21 +135,34 @@ ih.species.list <- subset(insect.his, insect.his$specific.epithet!="sp.")
 ##Create filedate to print the date the file is exported in the file name for uploading to Google Drive
 filedate <- print(format(Sys.Date(), "%Y%m%d"))
 
+##Create pathway for exported files
+drive.output <- "https://drive.google.com/drive/u/5/folders/1t21kymVP3y3ghdh_7MOl1ax4uZUTZwW0"
+
 ##Automate the newest file name output for processed Proctor's insect bird data
 insect.his.proc <- function(x) {
   insect <- basename(list.files(pattern = 'proctorinsect_processed')) 
   return(tail(insect, 1))
 }
 
-##Create pathway for exported files
-drive.output <- "https://drive.google.com/drive/u/5/folders/1t21kymVP3y3ghdh_7MOl1ax4uZUTZwW0"
+insect.mod.inat <- function(x) {
+  insect <- basename(list.files(pattern = 'inatinsect_processed')) 
+  return(tail(insect, 1))
+}
+
+
 
 ##File exporting
-#Write out modern insect data as .csv and upload to google drive
+#Change WD to put download data into the 'data' folder
+setwd(paste0(getwd(), "/data"))
 
+#Write out modern insect data as .csv and upload to google drive
+write_csv(im.species.list, paste('inatinsect_processed_', filedate, '.csv', sep=''))
+drive_upload(insect.mod.inat(), path = as_id(drive.output))
 
 #Write out historic insect data as .csv and upload to google drive
-write_csv(ih.species.list, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
+write_csv(ih.species.list2, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
 drive_upload(insect.his.proc(), path = as_id(drive.output))
 
-
+#Return working directory to main folder
+wd <- getwd()
+setwd(gsub("/data", "", wd))
