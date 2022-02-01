@@ -118,13 +118,21 @@ im.species.list[c('genus', 'trash')] <- str_split_fixed(im.species.list$scientif
 #Merge with taxonomy from the historic dataset and clean
 im.species.list2 <- merge(im.species.list, ih.species.list2, by = "scientific.name", all.x = TRUE) %>% 
   dplyr::select(-c('taxonomy','trash','genus.y','name.synonyms','locality.y')) %>% 
-  dplyr::select('order','super.family','family','genus.x','scientific.name', everything())
+  dplyr::select('order','super.family','family','genus.x','scientific.name', everything()) %>% 
+  rename('genus'='genus.x', 'locality'='locality.x')
 
-
+#Fill in the order, super family, and family names for NAs from proctor
 im.species.list2$order[is.na(im.species.list2$order)] <- im.species.list2$order[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$order))]
 im.species.list2$super.family[is.na(im.species.list2$super.family)] <- im.species.list2$super.family[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$super.family))]
 im.species.list2$family[is.na(im.species.list2$family)] <- im.species.list2$family[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$family))]
 
+#Fill in the order, super family, and family names for the remainging NAs from the iNaturalist taxon download in Google Drive
+im.species.list2$order[is.na(im.species.list2$order)] <- inat.taxon$taxon_order_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$order))]
+im.species.list2$super.family[is.na(im.species.list2$super.family)] <- inat.taxon$taxon_superfamily_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$super.family))]
+im.species.list2$family[is.na(im.species.list2$family)] <- inat.taxon$taxon_family_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$family))]
+
+#Remove a sneaky non-species level taxa
+im.species.list3 <- im.species.list2[!(im.species.list2$scientific.name=="Crambinae"),]
 
 
 #------------------------------------------------#
