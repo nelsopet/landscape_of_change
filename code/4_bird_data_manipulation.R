@@ -3,9 +3,23 @@
 #------------------------------------------------#
 ####           Packages Required              ####
 #------------------------------------------------#
+require(utils)
+require(readxl)
+require(tidyverse)
 require(dplyr)
 require(lubridate)
 require(doBy)
+
+
+#------------------------------------------------#
+####       Read in Required Bird Data         ####
+#------------------------------------------------#
+
+#Read in modern bird data
+bird.mod.ALL <- read.delim('data/ebd_US-ME-009_relDec-2021.txt', header = TRUE)
+
+#Read in historic bird data
+bird.his.ALL <- read_excel('data/csbirds_rawdata_readin.xlsx')
 
 
 #------------------------------------------------#
@@ -253,30 +267,23 @@ drive.output <- "https://drive.google.com/drive/u/5/folders/1t21kymVP3y3ghdh_7MO
 
 ##Automate the newest file name output for processed Champlain Society bird data
 bird.his.proc <- function(x) {
-  bird <- basename(list.files(pattern = 'csbirds_processed'))
+  bird <- basename(list.files(path = 'data/', pattern = 'csbirds_processed'))
   return(tail(bird, 1))
 }
 
 ##Automate the newest file name output for processed ebird data
 bird.mod.proc <- function(x) {
-  bird <- basename(list.files(pattern = 'ebird_processed'))
+  bird <- basename(list.files(path = 'data/', pattern = 'ebird_processed'))
   return(tail(bird, 1))
 }
 
 
-##File exporting
-#Change WD to put download data into the 'data' folder
-setwd(paste0(getwd(), "/data"))
-
+###File exporting
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(bm.species.list.final, paste('ebird_processed_', filedate, '.csv', sep=''))
-#drive_upload(bird.mod.proc(), path = as_id(drive.output))
+#write_csv(bm.species.list.final, paste('data/ebird_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.mod.proc()), path = as_id(drive.output))
 
 ##Write out historic bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(bh.species.list.final, paste('csbirds_processed_', filedate, '.csv', sep=''))
-#drive_upload(bird.his.proc(), path = as_id(drive.output))
-
-#Return working directory to main folder
-wd <- getwd()
-setwd(gsub("/data", "", wd))
+#write_csv(bh.species.list.final, paste('data/csbirds_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.his.proc()), path = as_id(drive.output))
 

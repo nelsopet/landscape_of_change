@@ -3,8 +3,29 @@
 #------------------------------------------------#
 ####           Packages Required              ####
 #------------------------------------------------#
+require(rinat)
+require(tidyverse)
+require(mapview)
+require(readxl)
+require(tidyverse)
 require(dplyr)
 require(lubridate)
+
+#------------------------------------------------#
+####       Read in Required Insect Data       ####
+#------------------------------------------------#
+
+##Read in the modern iNat data
+#Apidae data
+api.mod.ALL <- get_inat_obs(taxon_name = "Apidae",  quality = 'research', place_id = 174940, maxresults = 10000)
+#Lepidoptera data
+lep.mod.ALL <- get_inat_obs(taxon_name = "Lepidoptera",  quality = 'research', place_id = 174940, maxresults = 10000)
+
+##Read in the historical data
+#Apidae data
+api.his.ALL <- read_excel('data/proctorinsect_rawdata_readin.xlsx', sheet = 2)
+#Lepidoptera data
+lep.his.ALL <- read_excel('data/proctorinsect_rawdata_readin.xlsx', sheet = 1)
 
 
 #------------------------------------------------#
@@ -116,7 +137,7 @@ ih.species.list.final <- ih.species.list[!duplicated(ih.species.list$scientific.
 im.species.list[c('genus', 'trash')] <- str_split_fixed(im.species.list$scientific.name, ' ', 2)
 
 #Merge with taxonomy from the historic dataset and clean
-im.species.list2 <- merge(im.species.list, ih.species.list2, by = "scientific.name", all.x = TRUE) %>% 
+im.species.list2 <- base::merge(im.species.list, ih.species.list.final, by = "scientific.name", all.x = TRUE) %>% 
   dplyr::select(-c('taxonomy','trash','genus.y','name.synonyms','locality.y')) %>% 
   dplyr::select('order','super.family','family','genus.x','scientific.name', everything()) %>% 
   rename('genus'='genus.x', 'locality'='locality.x')
@@ -148,30 +169,22 @@ drive.output <- "https://drive.google.com/drive/u/5/folders/1t21kymVP3y3ghdh_7MO
 
 ##Automate the newest file name output for processed Proctor's insect bird data
 insect.his.proc <- function(x) {
-  insect <- basename(list.files(pattern = 'proctorinsect_processed')) 
+  insect <- basename(list.files(path = 'data/', pattern = 'proctorinsect_processed')) 
   return(tail(insect, 1))
 }
 
 insect.mod.inat <- function(x) {
-  insect <- basename(list.files(pattern = 'inatinsect_processed')) 
+  insect <- basename(list.files(path = 'data/', pattern = 'inatinsect_processed')) 
   return(tail(insect, 1))
 }
 
 
-
 ##File exporting
-#Change WD to put download data into the 'data' folder
-setwd(paste0(getwd(), "/data"))
-
 ##Write out modern insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(im.species.list.final, paste('inatinsect_processed_', filedate, '.csv', sep=''))
-#drive_upload(insect.mod.inat(), path = as_id(drive.output))
+#write_csv(im.species.list.final, paste('data/inatinsect_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', insect.mod.inat()), path = as_id(drive.output))
 
 ##Write out historic insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(ih.species.list.final, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
-#drive_upload(insect.his.proc(), path = as_id(drive.output))
-
-#Return working directory to main folder
-wd <- getwd()
-setwd(gsub("/data", "", wd))
+#write_csv(ih.species.list.final, paste('data/proctorinsect_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', insect.his.proc()), path = as_id(drive.output))
 
