@@ -268,13 +268,13 @@ bird.mod.proc <- function(x) {
 #Change WD to put download data into the 'data' folder
 setwd(paste0(getwd(), "/data"))
 
-#Write out modern bird data as .csv and upload to google drive
-write_csv(bm.species.list.final, paste('ebird_processed_', filedate, '.csv', sep=''))
-drive_upload(bird.mod.proc(), path = as_id(drive.output))
+##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(bm.species.list.final, paste('ebird_processed_', filedate, '.csv', sep=''))
+#drive_upload(bird.mod.proc(), path = as_id(drive.output))
 
-#Write out historic bird data as .csv and upload to google drive
-write_csv(bh.species.list.final, paste('csbirds_processed_', filedate, '.csv', sep=''))
-drive_upload(bird.his.proc(), path = as_id(drive.output))
+##Write out historic bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(bh.species.list.final, paste('csbirds_processed_', filedate, '.csv', sep=''))
+#drive_upload(bird.his.proc(), path = as_id(drive.output))
 
 #Return working directory to main folder
 wd <- getwd()

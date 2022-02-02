@@ -102,7 +102,7 @@ insect.his <- dplyr::select(insect.his.ALL, -c('class', 'trash', 'notes', 'vouch
 
 #Create species list
 ih.species.list <- subset(insect.his, insect.his$specific.epithet!="sp.")
-ih.species.list2 <- ih.species.list[!duplicated(ih.species.list$scientific.name), ] %>% 
+ih.species.list.final <- ih.species.list[!duplicated(ih.species.list$scientific.name), ] %>% 
   dplyr::select(-c('specific.epithet'))
 
 
@@ -132,7 +132,7 @@ im.species.list2$super.family[is.na(im.species.list2$super.family)] <- inat.taxo
 im.species.list2$family[is.na(im.species.list2$family)] <- inat.taxon$taxon_family_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$family))]
 
 #Remove a sneaky non-species level taxa
-im.species.list3 <- im.species.list2[!(im.species.list2$scientific.name=="Crambinae"),]
+im.species.list.final <- im.species.list2[!(im.species.list2$scientific.name=="Crambinae"),]
 
 
 #------------------------------------------------#
@@ -163,14 +163,15 @@ insect.mod.inat <- function(x) {
 #Change WD to put download data into the 'data' folder
 setwd(paste0(getwd(), "/data"))
 
-#Write out modern insect data as .csv and upload to google drive
-write_csv(im.species.list, paste('inatinsect_processed_', filedate, '.csv', sep=''))
-drive_upload(insect.mod.inat(), path = as_id(drive.output))
+##Write out modern insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(im.species.list.final, paste('inatinsect_processed_', filedate, '.csv', sep=''))
+#drive_upload(insect.mod.inat(), path = as_id(drive.output))
 
-#Write out historic insect data as .csv and upload to google drive
-write_csv(ih.species.list2, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
-drive_upload(insect.his.proc(), path = as_id(drive.output))
+##Write out historic insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(ih.species.list.final, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
+#drive_upload(insect.his.proc(), path = as_id(drive.output))
 
 #Return working directory to main folder
 wd <- getwd()
 setwd(gsub("/data", "", wd))
+
