@@ -102,7 +102,7 @@ insect.his <- dplyr::select(insect.his.ALL, -c('class', 'trash', 'notes', 'vouch
 
 #Create species list
 ih.species.list <- subset(insect.his, insect.his$specific.epithet!="sp.")
-ih.species.list2 <- ih.species.list[!duplicated(ih.species.list$scientific.name), ] %>% 
+ih.species.list.final <- ih.species.list[!duplicated(ih.species.list$scientific.name), ] %>% 
   dplyr::select(-c('specific.epithet'))
 
 
@@ -118,13 +118,21 @@ im.species.list[c('genus', 'trash')] <- str_split_fixed(im.species.list$scientif
 #Merge with taxonomy from the historic dataset and clean
 im.species.list2 <- merge(im.species.list, ih.species.list2, by = "scientific.name", all.x = TRUE) %>% 
   dplyr::select(-c('taxonomy','trash','genus.y','name.synonyms','locality.y')) %>% 
-  dplyr::select('order','super.family','family','genus.x','scientific.name', everything())
+  dplyr::select('order','super.family','family','genus.x','scientific.name', everything()) %>% 
+  rename('genus'='genus.x', 'locality'='locality.x')
 
-
+#Fill in the order, super family, and family names for NAs from proctor
 im.species.list2$order[is.na(im.species.list2$order)] <- im.species.list2$order[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$order))]
 im.species.list2$super.family[is.na(im.species.list2$super.family)] <- im.species.list2$super.family[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$super.family))]
 im.species.list2$family[is.na(im.species.list2$family)] <- im.species.list2$family[match(im.species.list2$genus,im.species.list2$genus)][which(is.na(im.species.list2$family))]
 
+#Fill in the order, super family, and family names for the remainging NAs from the iNaturalist taxon download in Google Drive
+im.species.list2$order[is.na(im.species.list2$order)] <- inat.taxon$taxon_order_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$order))]
+im.species.list2$super.family[is.na(im.species.list2$super.family)] <- inat.taxon$taxon_superfamily_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$super.family))]
+im.species.list2$family[is.na(im.species.list2$family)] <- inat.taxon$taxon_family_name[match(im.species.list2$genus,inat.taxon$taxon_genus_name)][which(is.na(im.species.list2$family))]
+
+#Remove a sneaky non-species level taxa
+im.species.list.final <- im.species.list2[!(im.species.list2$scientific.name=="Crambinae"),]
 
 
 #------------------------------------------------#
@@ -155,14 +163,15 @@ insect.mod.inat <- function(x) {
 #Change WD to put download data into the 'data' folder
 setwd(paste0(getwd(), "/data"))
 
-#Write out modern insect data as .csv and upload to google drive
-write_csv(im.species.list, paste('inatinsect_processed_', filedate, '.csv', sep=''))
-drive_upload(insect.mod.inat(), path = as_id(drive.output))
+##Write out modern insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(im.species.list.final, paste('inatinsect_processed_', filedate, '.csv', sep=''))
+#drive_upload(insect.mod.inat(), path = as_id(drive.output))
 
-#Write out historic insect data as .csv and upload to google drive
-write_csv(ih.species.list2, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
-drive_upload(insect.his.proc(), path = as_id(drive.output))
+##Write out historic insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(ih.species.list.final, paste('proctorinsect_processed_', filedate, '.csv', sep=''))
+#drive_upload(insect.his.proc(), path = as_id(drive.output))
 
 #Return working directory to main folder
 wd <- getwd()
 setwd(gsub("/data", "", wd))
+

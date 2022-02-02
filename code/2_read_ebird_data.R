@@ -22,3 +22,4 @@ bird.mod.ALL <- read.delim('ebd_US-ME-009_relDec-2021.txt', header = TRUE)
 #Return working directory to main folder
 wd <- getwd()
 setwd(gsub("/data", "", wd))
+

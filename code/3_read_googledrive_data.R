@@ -6,6 +6,7 @@
 require(readxl)
 require(tidyverse)
 require(googledrive)
+require(utils)
 
 
 #-----------------------------------------------------------------#
@@ -37,6 +38,10 @@ drive_download((drive_find(pattern = 'proctorinsect_rawdata', n_max=1)), overwri
 lep.his.ALL <- read_excel(insect.his.newest(insect), sheet = 1)
 api.his.ALL <- read_excel(insect.his.newest(insect), sheet = 2)
 
+#Insect taxonomy
+drive_download('https://drive.google.com/file/d/1QbCA8W7ernjGttTB6kH5KG3zYsbqnf4r/view?usp=sharing')
+inat.taxon <- read.csv('inat_taxonomy_20220130.csv', header = TRUE)
+
 
 ##BIRDS
 #Bird data from 1880s Champlain Society, Spelman, etc.
@@ -46,3 +51,4 @@ bird.his.ALL <- read_excel(bird.his.newest(bird))
 #Return working directory to main folder
 wd <- getwd()
 setwd(gsub("/data", "", wd))
+
