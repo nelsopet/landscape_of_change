@@ -1,4 +1,4 @@
-Common Name,Scientific Name,1880 Frequency,Current Frequency,Changes in Frequency
+common.name,scientific.name,frequency.1880,frequency.current,frequency.changes
 Alder Flycatcher,Empidonax alnorum,common,common,stable
 American Bittern,Botaurus lentiginosus,rare,uncommon,increased
 American Black Duck,Anas rubripes,common,common,stable
@@ -84,6 +84,6 @@ Winter Wren,Troglodytes hiemalis,common,common,stable
 Yellow Warbler,Setophaga petechia,common,common,stable
 Yellow-bellied Flycatcher,Empidonax flaviventris,common,rare,decreased
 Yellow-rumped Warbler,Setophaga coronata,common,common,stable
-NA,Antrostomus vociferus,rare,NA,decreased
-NA,Petrochelidon pyrrhonota,common,NA,decreased
-NA,Progne subis,rare,NA,decreased
+Eastern Whip-poor-will,Antrostomus vociferus,rare,not present,decreased
+Cliff Swallow,Petrochelidon pyrrhonota,common,not present,decreased
+Purple Martin,Progne subis,rare,not present,decreased

@@ -6,6 +6,7 @@
 require(utils)
 require(tidyverse)
 require(ggplot2)
+require(dplyr)
 require(doBy)
 
 
@@ -20,6 +21,7 @@ bird.his.analysis <- read.csv('data/csbirds_processed_readin.csv', header = TRUE
 #Bring in the processed ebird data from Google Drive
 drive_download((drive_find(pattern = 'ebird_processed', n_max=1)), path = 'data/ebird_processed_readin.csv', overwrite = TRUE)
 bird.mod.analysis <- read.csv('data/ebird_processed_readin.csv', header = TRUE)
+
 
 
 #------------------------------------------------#
@@ -80,8 +82,30 @@ freq.plot %>%
 ##Create table
 freq.table <- bird.analysis2 %>% 
   dplyr::select('common.name.x', 'scientific.name', 'frequency.y', 'frequency.x', 'freq.changes') %>% 
-  rename('Common Name'='common.name.x', 'Scientific Name'='scientific.name', '1880 Frequency'='frequency.y',
-         'Current Frequency'='frequency.x', 'Changes in Frequency'='freq.changes')
+  rename('common.name'='common.name.x', 'scientific.name'='scientific.name', 'frequency.1880'='frequency.y',
+         'frequency.current'='frequency.x', 'frequency.changes'='freq.changes')
+
+#Fix some entries
+freq.table['common.name'][freq.table['scientific.name'] == "Antrostomus vociferus"] <- 'Eastern Whip-poor-will'
+freq.table['common.name'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'Cliff Swallow'
+freq.table['common.name'][freq.table['scientific.name'] == "Progne subis"] <- 'Purple Martin'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Antrostomus vociferus"] <- 'not present'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'not present'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Progne subis"] <- 'not present'
+
+
+##Create data for table of modern species not recorded back in the 1880s
+#Merge
+modern <- right_join(bird.his.analysis, bird.mod.analysis, by = 'scientific.name')
+
+#Filter correct data out
+modern2 <- modern[is.na(modern$common.name.x), ]   
+modern2 <- filter(modern2, modern2$frequency.y == 'common' | modern2$frequency.y == 'uncommon')
+
+#Create final data for table
+modern.table <- modern2 %>% 
+  dplyr::select('common.name.y', 'scientific.name', 'frequency.y') %>% 
+  rename('common.name'='common.name.y', 'scientific.name'='scientific.name', 'frequency'='frequency.y')
 
 
 #------------------------------------------------#
@@ -93,4 +117,8 @@ freq.table <- bird.analysis2 %>%
 
 ##Write out dataframe for the freq table
 #write_csv(freq.table, paste('outputs/frequency_table_data', '.csv', sep=''))
+
+##Write out dataframe for the freq table
+#write_csv(modern.table, paste('outputs/modern_table_data', '.csv', sep=''))
+#write_csv(modern, paste('outputs/modern_fulltable_data', '.csv', sep=''))
 

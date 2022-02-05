@@ -5,7 +5,8 @@
 #------------------------------------------------#
 require(utils)
 require(tidyverse)
-
+require(ggplot2)
+require(dplyr)
 
 #------------------------------------------------#
 ####     Grabbing dataframes for analysis     ####
