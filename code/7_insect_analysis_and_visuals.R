@@ -4,7 +4,6 @@
 ####           Packages Required              ####
 #------------------------------------------------#
 require(utils)
-require(readxl)
 require(tidyverse)
 
 

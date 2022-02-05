@@ -11,6 +11,7 @@ require(tidyverse)
 require(dplyr)
 require(lubridate)
 
+
 #------------------------------------------------#
 ####       Read in Required Insect Data       ####
 #------------------------------------------------#
@@ -169,12 +170,12 @@ drive.output <- "https://drive.google.com/drive/u/5/folders/1t21kymVP3y3ghdh_7MO
 
 ##Automate the newest file name output for processed Proctor's insect bird data
 insect.his.proc <- function(x) {
-  insect <- basename(list.files(path = 'data/', pattern = 'proctorinsect_processed')) 
+  insect <- basename(list.files(path = 'data/', pattern = 'proctorinsect_processed_2')) 
   return(tail(insect, 1))
 }
 
 insect.mod.inat <- function(x) {
-  insect <- basename(list.files(path = 'data/', pattern = 'inatinsect_processed')) 
+  insect <- basename(list.files(path = 'data/', pattern = 'inatinsect_processed_2')) 
   return(tail(insect, 1))
 }
 
