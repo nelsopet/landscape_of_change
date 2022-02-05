@@ -1,0 +1,48 @@
+---
+title: "Landscape of Change Results"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## How have bird species populations changed from 1880 to now?
+
+### Bar Graph
+
+Below is a bar graph showing changes in the species recorded by the Champlain Society in the 1880s. To summarize, 16% of species increased, 25% decreased, and 59% remained the of the same frequency that the Champlain Society recording back then. 
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+require(dplyr)
+require(ggplot2)
+require(utils)
+
+freq.plot <- read.csv('frequency_plot_data.csv', header = TRUE)
+
+freq.plot %>% 
+  ggplot(aes(freq.changes, species.number, fill = freq.changes)) +
+  geom_bar(stat="identity", color="black") +
+  ggtitle("Species Frequency Changes from 1880 to Present") + 
+  geom_text(aes(label = species.number, vjust = 2)) +
+  guides(fill = FALSE) +
+  labs(x = "Change in Frequency", y = "Number of Species") +
+  theme_classic(base_size=14) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values=c("forestgreen", "darkslategray4", "darkorange3"))
+```
+
+### Species Specific Data Table
+
+Here is the total breakdown of species recorded by the Champlain Society with their frquency status from the 1880s and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+require(knitr)
+require(utils)
+
+freq.table <- read.csv('frequency_table_data.csv', header = TRUE)
+
+knitr::kable(freq.table)
+```
+
