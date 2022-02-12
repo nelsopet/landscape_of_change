@@ -3,9 +3,23 @@
 #------------------------------------------------#
 ####           Packages Required              ####
 #------------------------------------------------#
+require(utils)
+require(readxl)
+require(tidyverse)
 require(dplyr)
 require(lubridate)
 require(doBy)
+
+
+#------------------------------------------------#
+####       Read in Required Bird Data         ####
+#------------------------------------------------#
+
+#Read in modern bird data
+bird.mod.ALL <- read.delim('data/ebd_US-ME-009_relDec-2021.txt', header = TRUE)
+
+#Read in historic bird data
+bird.his.ALL <- read_excel('data/csbirds_rawdata_readin.xlsx')
 
 
 #------------------------------------------------#
@@ -20,7 +34,7 @@ bird.mod <- bird.mod.ALL[c('OBSERVATION.DATE', 'COMMON.NAME', 'SCIENTIFIC.NAME',
          'state.code'='STATE.CODE', 'county'='COUNTY', 'locality'='LOCALITY', 
          'latitude'='LATITUDE', 'longitude'='LONGITUDE')
 
-#Change the date from chr to ymd format to easily subset data from only year 2021
+#Change the date from chr to ymd format to easily subset data by years
 bird.mod$date <- ymd(bird.mod$ch.date)
 
 #Subset for year 2021, delete the old date column, and reorder columns
@@ -61,7 +75,7 @@ bm.species.list <- bird.mod.v4[!duplicated(bird.mod.v4$scientific.name), ] %>%
   dplyr::select(c('common.name', 'scientific.name', 'date', 'locality', 'latitude', 'longitude'))
 
 #Remove non species level taxa and any domestics
-bm.species.list2 <- bm.species.list[!grepl("sp.", bm.species.list$common.name),]
+bm.species.list2 <- bm.species.list[!grepl(" sp.", bm.species.list$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("/", bm.species.list2$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("(hybrid)", bm.species.list2$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("(Domestic type)", bm.species.list2$common.name),]
@@ -153,6 +167,10 @@ bird.his.v2['scientific.name'][bird.his.v2['common.name'] == "alder flycatcher"]
 #Fix scientific name of Osprey
 bird.his.v2['scientific.name'][bird.his.v2['scientific.name'] == "Pandion cristatus"] <- 'Pandion haliaetus'
 bird.his.v2['scientific.name'][bird.his.v2['common.name'] == "least sandpiper"] <- 'Calidris minutilla'
+bird.his.v2['scientific.name'][bird.his.v2['scientific.name'] == "Circus hudsonicus"] <- 'Circus hudsonius'
+bird.his.v2['scientific.name'][bird.his.v2['scientific.name'] == "Oceanodroma leucorhoa"] <- 'Hydrobates leucorhous'
+bird.his.v2['scientific.name'][bird.his.v2['scientific.name'] == "Picoides pubescens"] <- 'Dryobates pubescens'
+bird.his.v2['scientific.name'][bird.his.v2['common.name'] == "hairy woodpecker"] <- 'Dryobates villosus'
 
 #Make species list just for consistency
 bh.species.list <- bird.his.v2[-c(92,93,96),]
@@ -176,7 +194,7 @@ uncommon.bird <- function(x) {
                      his.com.not$scientific.name=="Dolichonyx oryzivorus" |
                      his.com.not$scientific.name=="Gavia immer" |  
                      his.com.not$scientific.name=="Tyrannus tyrannus" |   
-                     his.com.not$scientific.name=="Agelaius phoeniceus" |   
+                     his.com.not$scientific.name=="Agelaius phoeniceus" |  
                      his.com.not$scientific.name=="Accipiter striatus")
   return(whatrow)
 }
@@ -206,6 +224,8 @@ rare.bird <- function(x) {
                      his.com.not$scientific.name=="Pooecetes gramineus" | 
                      his.com.not$scientific.name=="Antrostomus vociferus" | 
                      his.com.not$scientific.name=="Loxia leucoptera" | 
+                     his.com.not$scientific.name=="Hydrobates leucorhous" |
+                     his.com.not$scientific.name=="Circus hudsonius" |
                      his.com.not$scientific.name=="Cardellina pusilla")
   return(whatrow)
 }
@@ -253,30 +273,23 @@ drive.output <- "https://drive.google.com/drive/u/5/folders/1t21kymVP3y3ghdh_7MO
 
 ##Automate the newest file name output for processed Champlain Society bird data
 bird.his.proc <- function(x) {
-  bird <- basename(list.files(pattern = 'csbirds_processed'))
+  bird <- basename(list.files(path = 'data/', pattern = 'csbirds_processed_2'))
   return(tail(bird, 1))
 }
 
 ##Automate the newest file name output for processed ebird data
 bird.mod.proc <- function(x) {
-  bird <- basename(list.files(pattern = 'ebird_processed'))
+  bird <- basename(list.files(path = 'data/', pattern = 'ebird_processed_2'))
   return(tail(bird, 1))
 }
 
 
-##File exporting
-#Change WD to put download data into the 'data' folder
-setwd(paste0(getwd(), "/data"))
-
+###File exporting
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(bm.species.list.final, paste('ebird_processed_', filedate, '.csv', sep=''))
-#drive_upload(bird.mod.proc(), path = as_id(drive.output))
+#write_csv(bm.species.list.final, paste('data/ebird_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.mod.proc()), path = as_id(drive.output))
 
 ##Write out historic bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(bh.species.list.final, paste('csbirds_processed_', filedate, '.csv', sep=''))
-#drive_upload(bird.his.proc(), path = as_id(drive.output))
-
-#Return working directory to main folder
-wd <- getwd()
-setwd(gsub("/data", "", wd))
+#write_csv(bh.species.list.final, paste('data/csbirds_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.his.proc()), path = as_id(drive.output))
 
