@@ -36,7 +36,7 @@ Chestnut-sided Warbler,Setophaga pensylvanica,common,common,stable
 Chimney Swift,Chaetura pelagica,common,rare,decreased
 Chipping Sparrow,Spizella passerina,common,common,stable
 Common Loon,Gavia immer,uncommon,common,increased
-Common Nighthawk,Chordeiles minor,common,uncommon,decreased
+Common Nighthawk,Chordeiles minor,common,common,stable
 Common Tern,Sterna hirundo,common,common,stable
 Common Yellowthroat,Geothlypis trichas,common,common,stable
 Dark-eyed Junco,Junco hyemalis,common,common,stable
@@ -54,7 +54,7 @@ Leach's Storm-Petrel,Hydrobates leucorhous,rare,rare,stable
 Magnolia Warbler,Setophaga magnolia,common,common,stable
 Nashville Warbler,Leiothlypis ruficapilla,common,uncommon,decreased
 Northern Flicker,Colaptes auratus,common,common,stable
-Northern Harrier,Circus hudsonius,rare,rare,stable
+Northern Harrier,Circus hudsonius,rare,uncommon,increased
 Northern Parula,Setophaga americana,common,common,stable
 Northern Waterthrush,Parkesia noveboracensis,rare,rare,stable
 Osprey,Pandion haliaetus,common,common,stable
@@ -65,7 +65,7 @@ Purple Finch,Haemorhous purpureus,common,common,stable
 Red Crossbill,Loxia curvirostra,rare,common,increased
 Red-breasted Nuthatch,Sitta canadensis,common,common,stable
 Red-eyed Vireo,Vireo olivaceus,common,common,stable
-Red-tailed Hawk,Buteo jamaicensis,rare,rare,stable
+Red-tailed Hawk,Buteo jamaicensis,rare,uncommon,increased
 Red-winged Blackbird,Agelaius phoeniceus,uncommon,common,increased
 Ring-necked Duck,Aythya collaris,rare,migrant only,decreased
 Ruby-throated Hummingbird,Archilochus colubris,common,common,stable
@@ -79,11 +79,12 @@ Tree Swallow,Tachycineta bicolor,common,common,stable
 Vesper Sparrow,Pooecetes gramineus,rare,rare,stable
 White-throated Sparrow,Zonotrichia albicollis,common,common,stable
 White-winged Crossbill,Loxia leucoptera,rare,uncommon,increased
-Wilson's Warbler,Cardellina pusilla,rare,migrant only,decreased
+Wilson's Warbler,Cardellina pusilla,rare,rare,stable
 Winter Wren,Troglodytes hiemalis,common,common,stable
 Yellow Warbler,Setophaga petechia,common,common,stable
 Yellow-bellied Flycatcher,Empidonax flaviventris,common,rare,decreased
 Yellow-rumped Warbler,Setophaga coronata,common,common,stable
 Eastern Whip-poor-will,Antrostomus vociferus,rare,not present,decreased
+Passenger Pigeon,Ectopistes migratorius,rare,extinct,decreased
 Cliff Swallow,Petrochelidon pyrrhonota,common,not present,decreased
 Purple Martin,Progne subis,rare,not present,decreased

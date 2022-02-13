@@ -20,16 +20,16 @@ library(sf)
 bird.mod.ALL <- read.delim('data/ebd_US-ME-009_relDec-2021.txt', header = TRUE)
 bird.modinat.ALL <- get_inat_obs(taxon_name = "Aves",  quality = 'research', place_id = 174940, maxresults = 10000)
 
-
 #Read in historic bird data
 bird.his.ALL <- read_excel('data/csbirds_rawdata_readin.xlsx')
-
 
 #Read in shapefile for filtering data
 loc.circle = read_sf("data/MDI_Circle.shp")
 
+
+
 #------------------------------------------------#
-####     Manipulation of Modern Bird Data     ####
+####    Manipulation of Modern eBird Data     ####
 #------------------------------------------------#
 
 ##Cleaning and subsetting
@@ -70,14 +70,52 @@ bird.mod.v5 <- pnts_sf %>% mutate(
 bird.mod.v5 <- filter(bird.mod.v5, intersection==1)
 
 bird.mod.v6 <- bird.mod.v5 %>% 
+  dplyr::select(-c('intersection', 'area', 'state.code', 'county', 'year', 'month', 'day'))
+
+
+
+#------------------------------------------------#
+####      Manipulation of iNat Bird Data      ####
+#------------------------------------------------#
+
+#Take the raw inat bird data and filter out what we don't need
+bird.inat <- bird.modinat.ALL %>% 
+  dplyr::select(c('common_name', 'scientific_name', 'datetime', 'place_guess', 'latitude', 'longitude')) %>% 
+  rename('common.name'='common_name', 'scientific.name'='scientific_name', 'locality'='place_guess') %>% 
+  subset(format(as.Date(datetime),"%Y")==2021 | format(as.Date(datetime),"%Y")==2020 |
+           format(as.Date(datetime),"%Y")==2019 | format(as.Date(datetime),"%Y")==2018)
+
+#Filter by the correct months and reorganize
+bird.inat[c('date', 'time')] <- str_split_fixed(bird.inat$datetime, ' ', 2)
+bird.inat[c('year', 'month', 'day')] <- str_split_fixed(bird.inat$date, '-', 3)
+bird.inat.v2 <- subset(bird.inat, month == "07" | month == "08" | month == "09")
+bird.inat.v2 <- subset(bird.inat.v2, !(month == "09" & day > "07")) %>% 
+  dplyr::select(c('common.name', 'scientific.name', 'date', 'locality', 'latitude', 'longitude'))
+
+#Filter by LOC polygon
+pnts_sf2 <- st_as_sf(bird.inat.v2, coords = c('longitude', 'latitude'), crs = st_crs(loc.circle))
+
+bird.inat.v3 <- pnts_sf2 %>% mutate(
+  intersection = as.integer(st_intersects(geometry, loc.circle))
+  , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+) 
+
+#Clean up the datasheet
+bird.inat.v4 <- bird.inat.v3 %>% 
   dplyr::select(-c('intersection', 'area'))
 
+#Merge the two location data together
+bird.mod.locs <- rbind(bird.inat.v4, bird.mod.v6)
+bird
 
 
+#------------------------------------------------#
+####   Creation of Modern Bird Species List   ####
+#------------------------------------------------#
 
 ##Species list
 #Create a species list from this MDI dataset
-bm.species.list <- bird.mod.v6[!duplicated(bird.mod.v6$scientific.name), ] %>%
+bm.species.list <- bird.mod.locs[!duplicated(bird.mod.locs$scientific.name), ] %>%
   dplyr::select(c('common.name', 'scientific.name'))
 
 #Remove non species level taxa and any domestics
@@ -87,9 +125,18 @@ bm.species.list2 <- bm.species.list2[!grepl("(hybrid)", bm.species.list2$common.
 bm.species.list2 <- bm.species.list2[!grepl("(Domestic type)", bm.species.list2$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("Helmeted Guineafowl", bm.species.list2$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("Chukar", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Large White-headed Gulls", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("American Black Duck × Mallard", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Northern Slate-colored Junco", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Myrtle Warbler", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Feral Pigeon", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Domestic Guineafowl", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Brown Thrushes and Nightingale-Thrushes", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("American Herring Gull", bm.species.list2$common.name),]
+
 
 #Create a table of frequencies by species and merge onto the 
-bm.freq <- as.data.frame(table(bird.mod.v6$common.name)) %>% 
+bm.freq <- as.data.frame(table(bird.mod.locs$common.name)) %>% 
   rename('common.name'='Var1')
 bm.species.list4 <- merge(bm.freq, bm.species.list2, by = "common.name")
 
@@ -140,6 +187,59 @@ bm.species.list5$frequency <- replace(bm.species.list5$frequency, mig.ebird(), '
 bm.species.list.final <- bm.species.list5 %>% 
   dplyr::select(-('Freq'))
 
+
+
+#------------------------------------------------#
+####      Manipulation of iNat Bird Data      ####
+#------------------------------------------------#
+
+#Take the raw inat bird data and filter out what we don't need
+bird.inat <- bird.modinat.ALL %>% 
+  dplyr::select(c('common_name', 'scientific_name', 'datetime', 'place_guess', 'latitude', 'longitude')) %>% 
+  rename('common.name'='common_name', 'scientific.name'='scientific_name', 'locality'='place_guess') %>% 
+  subset(format(as.Date(datetime),"%Y")==2021 | format(as.Date(datetime),"%Y")==2020 |
+           format(as.Date(datetime),"%Y")==2019 | format(as.Date(datetime),"%Y")==2018)
+
+#Filter by the correct months and reorganize
+bird.inat[c('date', 'time')] <- str_split_fixed(bird.inat$datetime, ' ', 2)
+bird.inat[c('year', 'month', 'day')] <- str_split_fixed(bird.inat$date, '-', 3)
+bird.inat.v2 <- subset(bird.inat, month == "07" | month == "08" | month == "09")
+bird.inat.v2 <- subset(bird.inat.v2, !(month == "09" & day > "07")) %>% 
+  dplyr::select(c('common.name', 'scientific.name', 'date', 'locality', 'latitude', 'longitude'))
+
+#Filter by LOC polygon
+pnts_sf2 <- st_as_sf(bird.inat.v2, coords = c('longitude', 'latitude'), crs = st_crs(loc.circle))
+
+bird.inat.v3 <- pnts_sf2 %>% mutate(
+  intersection = as.integer(st_intersects(geometry, loc.circle))
+  , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+) 
+
+#Clean up the datasheet
+bird.inat.v4 <- bird.inat.v3 %>% 
+  dplyr::select(-c('intersection', 'area'))
+
+#Merge the two location data together
+bird.mod.locs <- rbind(bird.inat.v4, bird.mod.v6)
+bird.mod.locs[c('long','lat')] <- str_split_fixed(bird.mod.locs$geometry, ', ', 2)
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs$long <- bird.mod.locs %>%
+  dplyr::select(long) %>%
+  mutate(long = str_replace(long, '^\\w\\(', ''))
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs$lat <- bird.mod.locs %>%
+  dplyr::select(lat) %>%
+  mutate(lat = str_replace(lat, '\\)$', ''))
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs <- bird.mod.locs %>% 
+  dplyr::select('common.name','scientific.name','date','locality','long','lat') %>% 
+  rename('longitude'='long', 'latitude'='lat')
 
 
 
@@ -293,14 +393,14 @@ bird.mod.locs <- function(x) {
 
 ###File exporting
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-write_csv(bm.species.list.final, paste('data/ebird_processed_', filedate, '.csv', sep=''))
-drive_upload(paste0('data/', bird.mod.proc()), path = as_id(drive.output))
+#write_csv(bm.species.list.final, paste('data/ebird_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.mod.proc()), path = as_id(drive.output))
 
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-write_csv(bird.mod.v6, paste('data/ebird_mappingloc_', filedate, '.csv', sep=''))
-drive_upload(paste0('data/', bird.mod.locs()), path = as_id(drive.output))
+#write_csv(bird.mod.locs, paste('data/ebird_mappingloc_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.mod.locs()), path = as_id(drive.output))
 
 ##Write out historic bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-write_csv(bh.species.list.final, paste('data/csbirds_processed_', filedate, '.csv', sep=''))
-drive_upload(paste0('data/', bird.his.proc()), path = as_id(drive.output))
+#write_csv(bh.species.list.final, paste('data/csbirds_processed_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.his.proc()), path = as_id(drive.output))
 
