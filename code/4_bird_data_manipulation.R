@@ -3,14 +3,15 @@
 #------------------------------------------------#
 ####           Packages Required              ####
 #------------------------------------------------#
+require(rinat)
 require(utils)
 require(readxl)
 require(tidyverse)
 require(dplyr)
 require(lubridate)
 require(doBy)
-library(sf)
-
+require(sf)
+require(googledrive)
 
 #------------------------------------------------#
 ####       Read in Required Bird Data         ####
@@ -106,7 +107,28 @@ bird.inat.v4 <- bird.inat.v3 %>%
 
 #Merge the two location data together
 bird.mod.locs <- rbind(bird.inat.v4, bird.mod.v6)
-bird
+bird.mod.locs[c('long','lat')] <- str_split_fixed(bird.mod.locs$geometry, ', ', 2)
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs$long <- bird.mod.locs %>%
+  dplyr::select(long) %>%
+  mutate(long = str_replace(long, '^\\w\\(', ''))
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs$lat <- bird.mod.locs %>%
+  dplyr::select(lat) %>%
+  mutate(lat = str_replace(lat, '\\)$', ''))
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs <- bird.mod.locs %>% 
+  dplyr::select('common.name','scientific.name','date','locality','long','lat') %>% 
+  rename('longitude'='long', 'latitude'='lat')
+
+bird.mod.locs['scientific.name'][bird.mod.locs['common.name'] == "Double-crested Cormorant"] <- 'Nannopterum auritum'
+
 
 
 #------------------------------------------------#
@@ -143,10 +165,10 @@ bm.species.list4 <- merge(bm.freq, bm.species.list2, by = "common.name")
 #Now take the species list and add a column denoting species commonness
 bm.species.list4$frequency <- ifelse(bm.species.list4$"Freq">50, "common", "uncommon")
 bm.species.list4['frequency'][bm.species.list4["Freq"] <20] <- "rare"
-bm.species.list4['frequency'][bm.species.list4["Freq"] <5] <- "migrant only"
+bm.species.list4['frequency'][bm.species.list4["Freq"] <5] <- "migrant/vagrant"
 
 #Reorder for ease of view
-bm.species.list5 <- bm.species.list4[c(1,3,2,5)]
+bm.species.list5 <- bm.species.list4[c(1,3,2,4)]
 
 #Fix species that are marked incorrectly
 #Create function to pull row numbers and make them rare
@@ -181,65 +203,11 @@ mig.ebird <- function(x) {
 
 
 #Append those species' status to migrant only
-bm.species.list5$frequency <- replace(bm.species.list5$frequency, mig.ebird(), 'migrant only')
+bm.species.list5$frequency <- replace(bm.species.list5$frequency, mig.ebird(), 'migrant/vagrant')
 
 ##Final output
 bm.species.list.final <- bm.species.list5 %>% 
   dplyr::select(-('Freq'))
-
-
-
-#------------------------------------------------#
-####      Manipulation of iNat Bird Data      ####
-#------------------------------------------------#
-
-#Take the raw inat bird data and filter out what we don't need
-bird.inat <- bird.modinat.ALL %>% 
-  dplyr::select(c('common_name', 'scientific_name', 'datetime', 'place_guess', 'latitude', 'longitude')) %>% 
-  rename('common.name'='common_name', 'scientific.name'='scientific_name', 'locality'='place_guess') %>% 
-  subset(format(as.Date(datetime),"%Y")==2021 | format(as.Date(datetime),"%Y")==2020 |
-           format(as.Date(datetime),"%Y")==2019 | format(as.Date(datetime),"%Y")==2018)
-
-#Filter by the correct months and reorganize
-bird.inat[c('date', 'time')] <- str_split_fixed(bird.inat$datetime, ' ', 2)
-bird.inat[c('year', 'month', 'day')] <- str_split_fixed(bird.inat$date, '-', 3)
-bird.inat.v2 <- subset(bird.inat, month == "07" | month == "08" | month == "09")
-bird.inat.v2 <- subset(bird.inat.v2, !(month == "09" & day > "07")) %>% 
-  dplyr::select(c('common.name', 'scientific.name', 'date', 'locality', 'latitude', 'longitude'))
-
-#Filter by LOC polygon
-pnts_sf2 <- st_as_sf(bird.inat.v2, coords = c('longitude', 'latitude'), crs = st_crs(loc.circle))
-
-bird.inat.v3 <- pnts_sf2 %>% mutate(
-  intersection = as.integer(st_intersects(geometry, loc.circle))
-  , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
-) 
-
-#Clean up the datasheet
-bird.inat.v4 <- bird.inat.v3 %>% 
-  dplyr::select(-c('intersection', 'area'))
-
-#Merge the two location data together
-bird.mod.locs <- rbind(bird.inat.v4, bird.mod.v6)
-bird.mod.locs[c('long','lat')] <- str_split_fixed(bird.mod.locs$geometry, ', ', 2)
-
-bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
-
-bird.mod.locs$long <- bird.mod.locs %>%
-  dplyr::select(long) %>%
-  mutate(long = str_replace(long, '^\\w\\(', ''))
-
-bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
-
-bird.mod.locs$lat <- bird.mod.locs %>%
-  dplyr::select(lat) %>%
-  mutate(lat = str_replace(lat, '\\)$', ''))
-
-bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
-
-bird.mod.locs <- bird.mod.locs %>% 
-  dplyr::select('common.name','scientific.name','date','locality','long','lat') %>% 
-  rename('longitude'='long', 'latitude'='lat')
 
 
 
@@ -352,7 +320,7 @@ mig.bird <- function(x) {
 }
 
 #Append those species' status to migrant only
-his.com.not$frequency <- replace(his.com.not$frequency, mig.bird(), 'migrant only')
+his.com.not$frequency <- replace(his.com.not$frequency, mig.bird(), 'migrant/vagrant')
 
 
 #Merge this back with the bh.species.list
@@ -386,19 +354,20 @@ bird.mod.proc <- function(x) {
 }
 
 ##Automate the newest file name output for bird locations data
-bird.mod.locs <- function(x) {
+bird.mod.loc <- function(x) {
   bird <- basename(list.files(path = 'data/', pattern = 'ebird_mappingloc_2'))
   return(tail(bird, 1))
 }
 
 ###File exporting
+##You will be asked in the command line to refresh a stale OAuth token, type "1" in the command line and run.
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(bm.species.list.final, paste('data/ebird_processed_', filedate, '.csv', sep=''))
 #drive_upload(paste0('data/', bird.mod.proc()), path = as_id(drive.output))
 
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(bird.mod.locs, paste('data/ebird_mappingloc_', filedate, '.csv', sep=''))
-#drive_upload(paste0('data/', bird.mod.locs()), path = as_id(drive.output))
+#drive_upload(paste0('data/', bird.mod.loc()), path = as_id(drive.output))
 
 ##Write out historic bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(bh.species.list.final, paste('data/csbirds_processed_', filedate, '.csv', sep=''))

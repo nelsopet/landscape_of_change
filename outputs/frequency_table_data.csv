@@ -18,8 +18,8 @@ Black Scoter,Melanitta americana,rare,uncommon,increased
 Black-and-white Warbler,Mniotilta varia,common,common,stable
 Black-billed Cuckoo,Coccyzus erythropthalmus,common,rare,decreased
 Black-capped Chickadee,Poecile atricapillus,common,common,stable
-Black-crowned Night-Heron,Nycticorax nycticorax,common,migrant only,decreased
-Black-legged Kittiwake,Rissa tridactyla,uncommon,migrant only,decreased
+Black-crowned Night-Heron,Nycticorax nycticorax,common,migrant/vagrant,decreased
+Black-legged Kittiwake,Rissa tridactyla,uncommon,migrant/vagrant,decreased
 Black-throated Blue Warbler,Setophaga caerulescens,rare,common,increased
 Black-throated Green Warbler,Setophaga virens,common,common,stable
 Blackburnian Warbler,Setophaga fusca,common,common,stable
@@ -27,7 +27,7 @@ Blue Jay,Cyanocitta cristata,rare,common,increased
 Blue-headed Vireo,Vireo solitarius,common,common,stable
 Bobolink,Dolichonyx oryzivorus,uncommon,uncommon,stable
 Bonaparte's Gull,Chroicocephalus philadelphia,uncommon,common,increased
-Boreal Chickadee,Poecile hudsonicus,rare,migrant only,decreased
+Boreal Chickadee,Poecile hudsonicus,rare,migrant/vagrant,decreased
 Broad-winged Hawk,Buteo platypterus,common,common,stable
 Brown Creeper,Certhia americana,rare,common,increased
 Canada Warbler,Cardellina canadensis,common,rare,decreased
@@ -49,7 +49,7 @@ Great Blue Heron,Ardea herodias,common,common,stable
 Hairy Woodpecker,Dryobates villosus,common,common,stable
 Hermit Thrush,Catharus guttatus,common,common,stable
 Herring Gull,Larus argentatus,common,common,stable
-Indigo Bunting,Passerina cyanea,rare,migrant only,decreased
+Indigo Bunting,Passerina cyanea,rare,migrant/vagrant,decreased
 Leach's Storm-Petrel,Hydrobates leucorhous,rare,rare,stable
 Magnolia Warbler,Setophaga magnolia,common,common,stable
 Nashville Warbler,Leiothlypis ruficapilla,common,uncommon,decreased
@@ -59,7 +59,7 @@ Northern Parula,Setophaga americana,common,common,stable
 Northern Waterthrush,Parkesia noveboracensis,rare,rare,stable
 Osprey,Pandion haliaetus,common,common,stable
 Ovenbird,Seiurus aurocapilla,common,common,stable
-Pied-billed Grebe,Podilymbus podiceps,rare,migrant only,decreased
+Pied-billed Grebe,Podilymbus podiceps,rare,migrant/vagrant,decreased
 Pine Siskin,Spinus pinus,common,rare,decreased
 Purple Finch,Haemorhous purpureus,common,common,stable
 Red Crossbill,Loxia curvirostra,rare,common,increased
@@ -67,7 +67,7 @@ Red-breasted Nuthatch,Sitta canadensis,common,common,stable
 Red-eyed Vireo,Vireo olivaceus,common,common,stable
 Red-tailed Hawk,Buteo jamaicensis,rare,uncommon,increased
 Red-winged Blackbird,Agelaius phoeniceus,uncommon,common,increased
-Ring-necked Duck,Aythya collaris,rare,migrant only,decreased
+Ring-necked Duck,Aythya collaris,rare,migrant/vagrant,decreased
 Ruby-throated Hummingbird,Archilochus colubris,common,common,stable
 Ruffed Grouse,Bonasa umbellus,common,rare,decreased
 Savannah Sparrow,Passerculus sandwichensis,common,common,stable
@@ -84,7 +84,7 @@ Winter Wren,Troglodytes hiemalis,common,common,stable
 Yellow Warbler,Setophaga petechia,common,common,stable
 Yellow-bellied Flycatcher,Empidonax flaviventris,common,rare,decreased
 Yellow-rumped Warbler,Setophaga coronata,common,common,stable
-Eastern Whip-poor-will,Antrostomus vociferus,rare,not present,decreased
+Eastern Whip-poor-will,Antrostomus vociferus,rare,migrant/vagrant,decreased
 Passenger Pigeon,Ectopistes migratorius,rare,extinct,decreased
-Cliff Swallow,Petrochelidon pyrrhonota,common,not present,decreased
-Purple Martin,Progne subis,rare,not present,decreased
+Cliff Swallow,Petrochelidon pyrrhonota,common,migrant/vagrant,decreased
+Purple Martin,Progne subis,rare,migrant/vagrant,decreased

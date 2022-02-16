@@ -77,7 +77,7 @@ freq.plot %>%
   geom_bar(stat="identity", color="black") +
   ggtitle("Species Frequency Changes from 1880 to Present") + 
   geom_text(aes(label = species.number, vjust = 2)) +
-  guides(fill = FALSE) +
+  guides(fill = "none") +
   labs(x = "Change in Frequency", y = "Number of Species") +
   theme_classic(base_size=14) +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -96,9 +96,9 @@ freq.table['common.name'][freq.table['scientific.name'] == "Antrostomus vociferu
 freq.table['common.name'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'Cliff Swallow'
 freq.table['common.name'][freq.table['scientific.name'] == "Progne subis"] <- 'Purple Martin'
 freq.table['common.name'][freq.table['scientific.name'] == "Ectopistes migratorius"] <- 'Passenger Pigeon'
-freq.table['frequency.current'][freq.table['scientific.name'] == "Antrostomus vociferus"] <- 'not present'
-freq.table['frequency.current'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'not present'
-freq.table['frequency.current'][freq.table['scientific.name'] == "Progne subis"] <- 'not present'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Antrostomus vociferus"] <- 'migrant/vagrant'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'migrant/vagrant'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Progne subis"] <- 'migrant/vagrant'
 freq.table['frequency.current'][freq.table['scientific.name'] == "Ectopistes migratorius"] <- 'extinct'
 
 
