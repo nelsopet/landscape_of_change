@@ -1,9 +1,10 @@
 common.name,scientific.name,frequency
+Blackpoll Warbler,Setophaga striata,uncommon
 Canada Goose,Branta canadensis,common
 Cape May Warbler,Setophaga tigrina,uncommon
 Common Eider,Somateria mollissima,common
 Common Grackle,Quiscalus quiscula,common
-Common Merganser,Mergus merganser,uncommon
+Common Merganser,Mergus merganser,common
 Common Raven,Corvus corax,common
 Cooper's Hawk,Accipiter cooperii,uncommon
 Double-crested Cormorant,Nannopterum auritum,common
@@ -12,8 +13,10 @@ Eastern Wood-Pewee,Contopus virens,common
 European Starling,Sturnus vulgaris,uncommon
 Gray Catbird,Dumetella carolinensis,common
 Great Black-backed Gull,Larus marinus,common
+Great Cormorant,Phalacrocorax carbo,uncommon
 Great Crested Flycatcher,Myiarchus crinitus,uncommon
 Great Egret,Ardea alba,uncommon
+Green-winged Teal,Anas crecca,uncommon
 Hooded Merganser,Lophodytes cucullatus,common
 House Finch,Haemorhous mexicanus,common
 House Sparrow,Passer domesticus,common
@@ -22,13 +25,14 @@ Least Flycatcher,Empidonax minimus,uncommon
 Mallard,Anas platyrhynchos,common
 Merlin,Falco columbarius,common
 Mourning Dove,Zenaida macroura,common
-Nelson's Sparrow,Ammospiza nelsoni,uncommon
+Nelson's Sparrow,Ammospiza nelsoni,common
 Northern Cardinal,Cardinalis cardinalis,common
 Northern Gannet,Morus bassanus,common
 Palm Warbler,Setophaga palmarum,uncommon
 Peregrine Falcon,Falco peregrinus,common
 Pileated Woodpecker,Dryocopus pileatus,common
 Pine Warbler,Setophaga pinus,common
+Red-necked Grebe,Podiceps grisegena,uncommon
 Ring-billed Gull,Larus delawarensis,common
 Rock Pigeon,Columba livia,common
 Ruby-crowned Kinglet,Corthylio calendula,uncommon
@@ -41,7 +45,7 @@ Veery,Catharus fuscescens,uncommon
 White-breasted Nuthatch,Sitta carolinensis,common
 White-winged Scoter,Melanitta deglandi,common
 Wild Turkey,Meleagris gallopavo,common
-Wilson's Storm-Petrel,Oceanites oceanicus,common
+Wilson's Storm-Petrel,Oceanites oceanicus,uncommon
 Wood Duck,Aix sponsa,common
 Wood Thrush,Hylocichla mustelina,common
 Yellow-bellied Sapsucker,Sphyrapicus varius,uncommon

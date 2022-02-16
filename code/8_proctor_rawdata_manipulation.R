@@ -95,7 +95,7 @@ api.vouch13[c('species.name.and.authority', 'collector', 'collection.date', 'col
 api.vouch13 <- api.vouch13[,-1]
 
 
-#Now bind all thse rows back together
+#Now bind all thse rows together
 api.vouch.all <- rbind(api.vouch1, api.vouch2)
 api.vouch.all <- rbind(api.vouch.all, api.vouch3)
 api.vouch.all <- rbind(api.vouch.all, api.vouch4)
@@ -163,7 +163,6 @@ lep.vouch13 <- dplyr::select(lep.his.ALL, 25)
 lep.vouch14 <- dplyr::select(lep.his.ALL, 26)
 lep.vouch15 <- dplyr::select(lep.his.ALL, 27)
 lep.vouch16 <- dplyr::select(lep.his.ALL, 28)
-
 
 
 ##Split and name columns
@@ -234,22 +233,43 @@ lep.vouch16 <- lep.vouch16[,-1]
 
 
 #Now bind all thse rows back together
-lep.vouch.all <- rbind(lep.vouch1, lep.vouch2)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch3)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch4)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch5)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch6)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch7)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch8)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch9)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch10)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch11)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch12)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch13)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch14)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch15)
-lep.vouch.all <- rbind(lep.vouch.all, lep.vouch16)
+lep.vouch.com <- rbind(lep.vouch1, lep.vouch2)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch3)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch4)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch5)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch6)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch7)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch8)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch9)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch10)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch11)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch12)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch13)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch14)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch15)
+lep.vouch.com <- rbind(lep.vouch.com, lep.vouch16)
 
+#Fix the catalog number column
+lep.vouch.com2 <- lep.vouch.com
+lep.vouch.com2[c('split1', 'split2', 'split3', 'split4', 'split5')] <- str_split_fixed(lep.vouch.com$catalog.number, ';', 5)
+
+lep.vouch.com3 <- lep.vouch.com2[grep("#", lep.vouch.com2$split1),]
+lep.vouch.com4 <- lep.vouch.com2[grep("#", lep.vouch.com2$split2),]
+lep.vouch.com5 <- lep.vouch.com2[grep("#", lep.vouch.com2$split3),]
+lep.vouch.com6 <- lep.vouch.com2[grep("#", lep.vouch.com2$split4),]
+
+
+lep.vouch.com7 <- lep.vouch.com2[grep("#", lep.vouch.com2$split5),]
+
+lep.vouch.com7$collection.locations <- paste(lep.vouch.com7$collection.location, lep.vouch.com7$split1, sep=",")
+lep.vouch.com7$collection.locations <- paste(lep.vouch.com7$collection.locations, lep.vouch.com7$split2, sep=",")
+lep.vouch.com7$collection.locations <- paste(lep.vouch.com7$collection.locations, lep.vouch.com7$split3, sep=",")
+lep.vouch.com7$collection.locations <- paste(lep.vouch.com7$collection.locations, lep.vouch.com7$split4, sep=",")
+
+
+lep.vouch.com <- data.frame(lapply(lep.vouch.com,c))
+
+lep.vouch.all <- lep.vouch.com
 
 #Clean
 lep.vouch.all$species.name.and.authority <- lep.vouch.all %>%
@@ -269,14 +289,15 @@ lep.vouch.all$collection.number <- lep.vouch.all %>%
   dplyr::select(collection.number) %>%
   mutate(collection.number = str_replace(collection.number, '\\w*\\s[:punct:]*\\s', ''))
 
+#lep.vouch.all$catalog.number <- lep.vouch.all %>%
+  #dplyr::select(catalog.number) %>%
+  #separate(col = catalog.number, into = c('trash', 'catalog.number2'), sep = '#')
+  #mutate(catalog.number = str_replace(catalog.number, '.*(\\s[:punct:][:punct:]\\s\\w*\\d*[:punct:])', '')) 
+  #mutate(catalog.number = str_replace(catalog.number, '[:punct:]$', ''))
+
 lep.vouch.all$collection.location <- lep.vouch.all %>%
   dplyr::select(collection.location) %>%
-  mutate(collection.location = str_replace(collection.location, '\\w*\\s\\w*[:punct:]\\s', ''))
-
-lep.vouch.all$catalog.number <- lep.vouch.all %>%
-  dplyr::select(catalog.number) %>%
-  mutate(catalog.number = str_replace(catalog.number, '\\w*\\s[:punct:]*\\s', '')) %>% 
-  mutate(catalog.number = str_replace(catalog.number, '[:punct:]$', ''))
+  mutate(collection.location = str_replace(collection.location, '^\\s\\w*\\s\\w*[:punct:]\\s', ''))
 
 
 #Remove no specimens found and blank rows
@@ -284,6 +305,111 @@ lep.vouch.all <- subset(lep.vouch.all, lep.vouch.all$species.name.and.authority 
 lep.vouch.all <- subset(lep.vouch.all, lep.vouch.all$species.name.and.authority != '')
 
 
+#------------------------------------------------#
+####      Fixing columns in list format       ####
+#------------------------------------------------#
+
+#Coerce out a list format
+api.vouch.clean <- data.frame(lapply(api.vouch.all,c))
+lep.vouch.clean <- data.frame(lapply(lep.vouch.all,c))
+
+
+#------------------------------------------------#
+####     Merging data to get final output     ####
+#------------------------------------------------#
+
+##Rename columns for merge
+#Api
+api.his.merge <- api.his.ALL %>% 
+  rename( "super.family"="Super Family", 'phylum'="Phylum", 'class'="Class", 'order'="ORDER",
+          'family'="FAMILY", 'species.name.and.authority'="Species Name & authority", 
+          'synonymy'="Synonymy/Other Names", 'locations'="Locations", 'abundance'="Abundance", 'notes'="Notes")
+  
+#Lep
+lep.his.merge <- lep.his.ALL %>% 
+  rename( "super.family"="Super Family", 'phylum'="Phylum", 'class'="Class", 'order'="ORDER",
+        'family'="FAMILY", 'species.name.and.authority'="Species Name & authority", 
+        'synonymy'="Synonymy/Other Names", 'locations'="Locations", 'abundance'="Abundance", 'notes'="Notes")
+
+
+##Data manipulation for merge
+#Split columns
+api.his.merge[c('genus', 'se', 'naming.authority')] <- str_split_fixed(api.his.merge$species.name.and.authority, ' ', 3)
+lep.his.merge[c('genus', 'se', 'naming')] <- str_split_fixed(lep.his.merge$species.name.and.authority, ' ', 3)
+lep.his.merge[c('naming.authority', 'trash')] <- str_split_fixed(lep.his.merge$naming, ',', 2)
+api.vouch.clean[c('genus', 'se', 'naming.authority')] <- str_split_fixed(api.vouch.clean$species.name.and.authority, ' ', 3)
+lep.vouch.clean[c('genus', 'se', 'naming.authority')] <- str_split_fixed(lep.vouch.clean$species.name.and.authority, ' ', 3)
+
+#Combine species.name
+api.his.merge$species.name <- paste(api.his.merge$genus, api.his.merge$se, sep=" ")
+lep.his.merge$species.name <- paste(lep.his.merge$genus, lep.his.merge$se, sep=" ")
+api.vouch.clean$species.name <- paste(api.vouch.clean$genus, api.vouch.clean$se, sep=" ")
+lep.vouch.clean$species.name <- paste(lep.vouch.clean$genus, lep.vouch.clean$se, sep=" ")
+
+#Fix specific instances
+api.vouch.clean['naming.authority'][api.vouch.clean['species.name'] == "Psithyrus laboriosus"] <- 'Fabricius'
+
+#Clean up columns
+api.his.merge2 <- api.his.merge %>% 
+  dplyr::select(-c(11:31, 'se', 'species.name.and.authority'))
+  
+lep.his.merge2 <- lep.his.merge %>% 
+  dplyr::select(-c(11:50, 'se', 'naming', 'trash', 'species.name.and.authority'))
+
+api.vouch.clean2 <- api.vouch.clean %>% 
+  dplyr::select(-c('se', 'species.name.and.authority'))
+
+lep.vouch.clean2 <- lep.vouch.clean %>% 
+  dplyr::select(-c('se', 'species.name.and.authority'))
+
+#Remove parentheses in naming.authority
+api.his.merge2$naming.authority <- api.his.merge2 %>%
+  dplyr::select(naming.authority) %>%
+  mutate(naming.authority = str_replace(naming.authority, '\\((\\w*)\\)', '\\1'))
+
+lep.his.merge2$naming.authority <- lep.his.merge2 %>%
+  dplyr::select(naming.authority) %>%
+  mutate(naming.authority = str_replace(naming.authority, '\\(', ''))
+
+api.vouch.clean2$naming.authority <- api.vouch.clean2 %>%
+  dplyr::select(naming.authority) %>%
+  mutate(naming.authority = str_replace(naming.authority, '\\((\\w*)\\)', '\\1'))
+
+#Extra work for leps
+lep.vouch.clean2 <- data.frame(lapply(lep.vouch.clean2,c))
+
+lep.vouch.clean2$naming.authority <- lep.vouch.clean2 %>%
+  dplyr::select(naming.authority) %>%
+  mutate(naming.authority = str_replace(naming.authority, '\\((\\w*)\\)', '\\1')) %>% 
+  mutate(naming.authority = str_replace(naming.authority, '\\((\\w*\\s\\W\\s\\w*)\\)', '\\1'))
+
+lep.vouch.clean3 <- data.frame(lapply(lep.vouch.clean2,c))
+
+lep.vouch.clean3$naming.authority <- lep.vouch.clean3 %>%
+  dplyr::select(naming.authority) %>%
+  mutate(naming.authority = str_replace(naming.authority, '([:upper:]\\w*)\\s\\w*', '\\1')) %>% 
+  mutate(naming.authority = str_replace(naming.authority, '\\w*\\s([:upper:]\\w*)', '\\1')) %>% 
+  mutate(naming.authority = str_replace(naming.authority, '\\s[:lower:]\\w*', '')) %>% 
+  mutate(naming.authority = str_replace(naming.authority, '^[:lower:]\\w*', '')) 
+
+lep.vouch.clean4 <- data.frame(lapply(lep.vouch.clean3,c))
+
+lep.vouch.clean4$naming.authority <- lep.vouch.clean4 %>%
+  dplyr::select(naming.authority) %>%
+  mutate(naming.authority = str_replace(naming.authority, '\\((\\w*)\\)', '\\1')) %>% 
+  mutate(naming.authority = str_replace(naming.authority, '\\((\\w*\\W\\w*)\\)', '\\1'))
+
+#Ensure correct formatting
+api.his.merge2 <- data.frame(lapply(api.his.merge2,c))
+lep.his.merge2 <- data.frame(lapply(lep.his.merge2,c))
+api.vouch.clean2 <- data.frame(lapply(api.vouch.clean2,c))
+lep.vouch.clean4 <- data.frame(lapply(lep.vouch.clean4,c))
+
+
+##Merge 
+#api.his.merge with api.vouch.clean
+api.vouch.final <- api.vouch.clean %>% 
+  merge(api.his.merge, by = 'species.name.and.authority', all.x = TRUE)
 
 #------------------------------------------------#
 ####        Writing Out New .csv Files        ####
@@ -308,11 +434,12 @@ lep.pull <- function(x) {
 }
 
 
+
 ##File exporting
 ##Write out modern insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(api.vouch.all, paste('data/apivoucher_rawdata_', filedate, '.csv', sep=''))
+write_csv(api.vouch.final, paste('data/apivoucher_rawdata_', filedate, '.csv', sep=''))
 #drive_upload(paste0('data/', api.pull()), path = as_id(drive.output))
 
 ##Write out historic insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
-#write_csv(lep.vouch.all, paste('data/lepvoucher_rawdata_', filedate, '.csv', sep=''))
+write_csv(lep.vouch.final, paste('data/lepvoucher_rawdata_', filedate, '.csv', sep=''))
 #drive_upload(paste0('data/', lep.pull()), path = as_id(drive.output))

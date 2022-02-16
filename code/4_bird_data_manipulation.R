@@ -3,13 +3,15 @@
 #------------------------------------------------#
 ####           Packages Required              ####
 #------------------------------------------------#
+require(rinat)
 require(utils)
 require(readxl)
 require(tidyverse)
 require(dplyr)
 require(lubridate)
 require(doBy)
-
+require(sf)
+require(googledrive)
 
 #------------------------------------------------#
 ####       Read in Required Bird Data         ####
@@ -17,13 +19,18 @@ require(doBy)
 
 #Read in modern bird data
 bird.mod.ALL <- read.delim('data/ebd_US-ME-009_relDec-2021.txt', header = TRUE)
+bird.modinat.ALL <- get_inat_obs(taxon_name = "Aves",  quality = 'research', place_id = 174940, maxresults = 10000)
 
 #Read in historic bird data
 bird.his.ALL <- read_excel('data/csbirds_rawdata_readin.xlsx')
 
+#Read in shapefile for filtering data
+loc.circle = read_sf("data/MDI_Circle.shp")
+
+
 
 #------------------------------------------------#
-####     Manipulation of Modern Bird Data     ####
+####    Manipulation of Modern eBird Data     ####
 #------------------------------------------------#
 
 ##Cleaning and subsetting
@@ -38,41 +45,100 @@ bird.mod <- bird.mod.ALL[c('OBSERVATION.DATE', 'COMMON.NAME', 'SCIENTIFIC.NAME',
 bird.mod$date <- ymd(bird.mod$ch.date)
 
 #Subset for year 2021, delete the old date column, and reorder columns
-bird.mod.2021 <- subset(bird.mod, format(as.Date(date),"%Y")==2021) %>% 
+bird.mod.v2 <- subset(bird.mod, format(as.Date(date),"%Y")==2021 | format(as.Date(date),"%Y")==2020 |
+                          format(as.Date(date),"%Y")==2019 | format(as.Date(date),"%Y")==2018) %>% 
   dplyr::select(-('ch.date')) %>% 
   dplyr::select('common.name', 'scientific.name', 'date', everything())
-bird.mod.2020 <- subset(bird.mod, format(as.Date(date),"%Y")==2020) %>% 
-  dplyr::select(-('ch.date')) %>% 
-  dplyr::select('common.name', 'scientific.name', 'date', everything())
-bird.mod.2019 <- subset(bird.mod, format(as.Date(date),"%Y")==2019) %>% 
-  dplyr::select(-('ch.date')) %>% 
-  dplyr::select('common.name', 'scientific.name', 'date', everything())
-bird.mod.2018 <- subset(bird.mod, format(as.Date(date),"%Y")==2018) %>% 
-  dplyr::select(-('ch.date')) %>% 
-  dplyr::select('common.name', 'scientific.name', 'date', everything())
-
-#Combine data from all 4 years
-bird.mod.v2 <- rbind(bird.mod.2021, bird.mod.2020)
-bird.mod.v2 <- rbind(bird.mod.v2, bird.mod.2019)
-bird.mod.v2 <- rbind(bird.mod.v2, bird.mod.2018)
 
 #Subset for only months july, august, and first week of sept
 bird.mod.v2[c('year', 'month', 'day')] <- str_split_fixed(bird.mod.v2$dat, '-', 3)
-bird.mod.07 <- subset(bird.mod.v2, month == "07")
-bird.mod.08 <- subset(bird.mod.v2, month == "08")
-
-#Combine new data frame
-bird.mod.v3 <- rbind(bird.mod.07, bird.mod.08)
-
+bird.mod.v3 <- subset(bird.mod.v2, month == "07" | month == "08" | month == "09")
+bird.mod.v4 <- subset(bird.mod.v3, !(month == "09" & day > "07"))
+ 
 #Take the Hancock county wide data and narrow to our defined geographic study area
-bird.mod.v4 <- bird.mod.v3[bird.mod.v3$latitude < 44.49284 & bird.mod.v3$latitude > 44.16919 & 
-                            bird.mod.v3$longitude < -68.14983 & bird.mod.v3$longitude > -68.47352,]
+pnts_sf <- st_as_sf(bird.mod.v4, coords = c('longitude', 'latitude'), crs = st_crs(loc.circle))
 
+bird.mod.v5 <- pnts_sf %>% mutate(
+  intersection = as.integer(st_intersects(geometry, loc.circle))
+  , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+) 
+
+#An alternative way to grab point within bbox; not as specific but not the worst
+#bird.mod.v4 <- bird.mod.v3[bird.mod.v3$latitude < 44.49284 & bird.mod.v3$latitude > 44.16919 & 
+#                            bird.mod.v3$longitude < -68.14983 & bird.mod.v3$longitude > -68.47352,]
+
+#filter by those records inside polygon
+bird.mod.v5 <- filter(bird.mod.v5, intersection==1)
+
+bird.mod.v6 <- bird.mod.v5 %>% 
+  dplyr::select(-c('intersection', 'area', 'state.code', 'county', 'year', 'month', 'day'))
+
+
+
+#------------------------------------------------#
+####      Manipulation of iNat Bird Data      ####
+#------------------------------------------------#
+
+#Take the raw inat bird data and filter out what we don't need
+bird.inat <- bird.modinat.ALL %>% 
+  dplyr::select(c('common_name', 'scientific_name', 'datetime', 'place_guess', 'latitude', 'longitude')) %>% 
+  rename('common.name'='common_name', 'scientific.name'='scientific_name', 'locality'='place_guess') %>% 
+  subset(format(as.Date(datetime),"%Y")==2021 | format(as.Date(datetime),"%Y")==2020 |
+           format(as.Date(datetime),"%Y")==2019 | format(as.Date(datetime),"%Y")==2018)
+
+#Filter by the correct months and reorganize
+bird.inat[c('date', 'time')] <- str_split_fixed(bird.inat$datetime, ' ', 2)
+bird.inat[c('year', 'month', 'day')] <- str_split_fixed(bird.inat$date, '-', 3)
+bird.inat.v2 <- subset(bird.inat, month == "07" | month == "08" | month == "09")
+bird.inat.v2 <- subset(bird.inat.v2, !(month == "09" & day > "07")) %>% 
+  dplyr::select(c('common.name', 'scientific.name', 'date', 'locality', 'latitude', 'longitude'))
+
+#Filter by LOC polygon
+pnts_sf2 <- st_as_sf(bird.inat.v2, coords = c('longitude', 'latitude'), crs = st_crs(loc.circle))
+
+bird.inat.v3 <- pnts_sf2 %>% mutate(
+  intersection = as.integer(st_intersects(geometry, loc.circle))
+  , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+) 
+
+#Clean up the datasheet
+bird.inat.v4 <- bird.inat.v3 %>% 
+  dplyr::select(-c('intersection', 'area'))
+
+#Merge the two location data together
+bird.mod.locs <- rbind(bird.inat.v4, bird.mod.v6)
+bird.mod.locs[c('long','lat')] <- str_split_fixed(bird.mod.locs$geometry, ', ', 2)
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs$long <- bird.mod.locs %>%
+  dplyr::select(long) %>%
+  mutate(long = str_replace(long, '^\\w\\(', ''))
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs$lat <- bird.mod.locs %>%
+  dplyr::select(lat) %>%
+  mutate(lat = str_replace(lat, '\\)$', ''))
+
+bird.mod.locs <- data.frame(lapply(bird.mod.locs,c))
+
+bird.mod.locs <- bird.mod.locs %>% 
+  dplyr::select('common.name','scientific.name','date','locality','long','lat') %>% 
+  rename('longitude'='long', 'latitude'='lat')
+
+bird.mod.locs['scientific.name'][bird.mod.locs['common.name'] == "Double-crested Cormorant"] <- 'Nannopterum auritum'
+
+
+
+#------------------------------------------------#
+####   Creation of Modern Bird Species List   ####
+#------------------------------------------------#
 
 ##Species list
 #Create a species list from this MDI dataset
-bm.species.list <- bird.mod.v4[!duplicated(bird.mod.v4$scientific.name), ] %>%
-  dplyr::select(c('common.name', 'scientific.name', 'date', 'locality', 'latitude', 'longitude'))
+bm.species.list <- bird.mod.locs[!duplicated(bird.mod.locs$scientific.name), ] %>%
+  dplyr::select(c('common.name', 'scientific.name'))
 
 #Remove non species level taxa and any domestics
 bm.species.list2 <- bm.species.list[!grepl(" sp.", bm.species.list$common.name),]
@@ -81,22 +147,28 @@ bm.species.list2 <- bm.species.list2[!grepl("(hybrid)", bm.species.list2$common.
 bm.species.list2 <- bm.species.list2[!grepl("(Domestic type)", bm.species.list2$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("Helmeted Guineafowl", bm.species.list2$common.name),]
 bm.species.list2 <- bm.species.list2[!grepl("Chukar", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Large White-headed Gulls", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("American Black Duck × Mallard", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Northern Slate-colored Junco", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Myrtle Warbler", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Feral Pigeon", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Domestic Guineafowl", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("Brown Thrushes and Nightingale-Thrushes", bm.species.list2$common.name),]
+bm.species.list2 <- bm.species.list2[!grepl("American Herring Gull", bm.species.list2$common.name),]
 
-#Alphebetically order
-bm.species.list3 <-  orderBy("common.name", bm.species.list2)
 
 #Create a table of frequencies by species and merge onto the 
-bm.freq <- as.data.frame(table(bird.mod.v4$common.name)) %>% 
+bm.freq <- as.data.frame(table(bird.mod.locs$common.name)) %>% 
   rename('common.name'='Var1')
-bm.species.list4 <- merge(bm.freq, bm.species.list3, by = "common.name")
+bm.species.list4 <- merge(bm.freq, bm.species.list2, by = "common.name")
 
 #Now take the species list and add a column denoting species commonness
 bm.species.list4$frequency <- ifelse(bm.species.list4$"Freq">50, "common", "uncommon")
 bm.species.list4['frequency'][bm.species.list4["Freq"] <20] <- "rare"
-bm.species.list4['frequency'][bm.species.list4["Freq"] <5] <- "migrant only"
+bm.species.list4['frequency'][bm.species.list4["Freq"] <5] <- "migrant/vagrant"
 
 #Reorder for ease of view
-bm.species.list5 <- bm.species.list4[c(1,3,8,2,4,5,6,7)]
+bm.species.list5 <- bm.species.list4[c(1,3,2,4)]
 
 #Fix species that are marked incorrectly
 #Create function to pull row numbers and make them rare
@@ -123,21 +195,19 @@ mig.ebird <- function(x) {
                      bm.species.list5$scientific.name=="Pluvialis squatarola" |
                      bm.species.list5$scientific.name=="Phalaropus lobatus" |
                      bm.species.list5$scientific.name=="Spizella pusilla" |
+                     bm.species.list5$scientific.name=="Tringa flavipes" |
+                     bm.species.list5$scientific.name=="Calidris fuscicollis" |
                      bm.species.list5$scientific.name=="Tringa solitaria")
   return(whatrow)
 }
 
-#Append those species' status to migrant only
-bm.species.list5$frequency <- replace(bm.species.list5$frequency, mig.ebird(), 'migrant only')
 
+#Append those species' status to migrant only
+bm.species.list5$frequency <- replace(bm.species.list5$frequency, mig.ebird(), 'migrant/vagrant')
 
 ##Final output
-#Split date column to just retain year
-bm.species.list5[c('year', 'trash')] <- str_split_fixed(bm.species.list5$date, '-', 2)
-
-#Remove columns and reorder
-bm.species.list.final <- bm.species.list5[, -c(4,5,7,8,10)] %>% 
-  dplyr::select('common.name', 'scientific.name', 'year', 'locality', 'frequency')
+bm.species.list.final <- bm.species.list5 %>% 
+  dplyr::select(-('Freq'))
 
 
 
@@ -172,17 +242,16 @@ bird.his.v2['scientific.name'][bird.his.v2['scientific.name'] == "Oceanodroma le
 bird.his.v2['scientific.name'][bird.his.v2['scientific.name'] == "Picoides pubescens"] <- 'Dryobates pubescens'
 bird.his.v2['scientific.name'][bird.his.v2['common.name'] == "hairy woodpecker"] <- 'Dryobates villosus'
 
-#Make species list just for consistency
-bh.species.list <- bird.his.v2[-c(92,93,96),]
 
 
 
 ###Making a qualitative frequency column
 #Take the species list and add a column for frequency and remove Wild Turkey and Wood Thrush
+bh.species.list <- bird.his.v2[-c(93, 94, 97),]
 his.com.not <- bh.species.list[, c(1:2)]
 
 #Add in the commonness column starting with common listed for all nows
-his.com.not <- cbind(his.com.not, data.frame(rep(c('common'),times=97))) 
+his.com.not <- cbind(his.com.not, data.frame(rep(c('common'),times=98))) 
 colnames(his.com.not) <- c('common.name', 'scientific.name', 'frequency')
 
 ##Change frequency status for uncommon species
@@ -215,6 +284,7 @@ rare.bird <- function(x) {
                      his.com.not$scientific.name=="Certhia americana" | 
                      his.com.not$scientific.name=="Passerina cyanea" | 
                      his.com.not$scientific.name=="Parkesia noveboracensis" | 
+                     his.com.not$scientific.name=="Ectopistes migratorius" | 
                      his.com.not$scientific.name=="Sayornis phoebe" | 
                      his.com.not$scientific.name=="Podilymbus podiceps" | 
                      his.com.not$scientific.name=="Progne subis" | 
@@ -250,7 +320,7 @@ mig.bird <- function(x) {
 }
 
 #Append those species' status to migrant only
-his.com.not$frequency <- replace(his.com.not$frequency, mig.bird(), 'migrant only')
+his.com.not$frequency <- replace(his.com.not$frequency, mig.bird(), 'migrant/vagrant')
 
 
 #Merge this back with the bh.species.list
@@ -283,11 +353,21 @@ bird.mod.proc <- function(x) {
   return(tail(bird, 1))
 }
 
+##Automate the newest file name output for bird locations data
+bird.mod.loc <- function(x) {
+  bird <- basename(list.files(path = 'data/', pattern = 'ebird_mappingloc_2'))
+  return(tail(bird, 1))
+}
 
 ###File exporting
+##You will be asked in the command line to refresh a stale OAuth token, type "1" in the command line and run.
 ##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(bm.species.list.final, paste('data/ebird_processed_', filedate, '.csv', sep=''))
 #drive_upload(paste0('data/', bird.mod.proc()), path = as_id(drive.output))
+
+##Write out modern bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(bird.mod.locs, paste('data/ebird_mappingloc_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bird.mod.loc()), path = as_id(drive.output))
 
 ##Write out historic bird data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(bh.species.list.final, paste('data/csbirds_processed_', filedate, '.csv', sep=''))
