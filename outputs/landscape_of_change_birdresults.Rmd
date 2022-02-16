@@ -51,7 +51,7 @@ mdi.map <- get_stamenmap(
 
 ### Summary
 
-Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird data from 2018-2021. Since the effort of birders today is much more extensive than what could have been possible in the 1880's lets compare the species diversity of common species. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 4** lists all species that were not recorded historically, but are now common. But, when looking at the changes of the species recorded historically we do see a `r (round(((length(which(freq.table$frequency.changes=='decreased'))*100)/88), digits=2))`% decrease in these species (**Fiugre 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with the most severe changes over the last 150 years. For a full list of changes to species see **Table 5**.
+Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird and iNaturalist data from 2018-2021. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 1** lists all species that were not recorded historically or were rare, but are now common or have increased greatly since the 1880s. When looking at the changes of the species recorded historically we do see a `r (round(((length(which(freq.table$frequency.changes=='decreased'))*100)/88), digits=2))`% decrease in these species (**Fiugre 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with noteable changes over the last 150 years. For a full list of changes to species see **Table 4**.
 
 
 ### Bar Graph of Species Changes
@@ -76,10 +76,80 @@ freq.plot %>%
 
 
 
-### Drastically Decreasing Species
+### Notably Increasing Species
 
 
-**Table 1**. This table shows the species that have decreased drastically in abundance since the 1880s.
+**Table 1**. This table shows the species that have increased drastically in abundance since the 1880s. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+knitr::kable(inc.table)
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 5**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI.'}
+
+#BTBW
+ggmap(mdi.map) +
+  geom_point(data=BTBW,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black', 
+             fill = '#006699',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("Black-throated Blue Warbler Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 6**. Blue Jay (*Cyanocitta cristata*) distribution across MDI.'}
+
+#BLJA
+ggmap(mdi.map) +
+  geom_point(data=BLJA,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black',
+             fill = '#0099FF',
+             stroke = 1,
+             alpha = 0.5) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("Blue Jay Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 7**. Eastern Phoebe (*Sayornis phoebe*) distribution across MDI.'}
+
+#EAPH
+ggmap(mdi.map) +
+  geom_point(data=EAPH,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black', 
+             fill = '#996633',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("Eastern Phoebe Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
+
+```
+
+
+
+
+### Noteably Decreasing Species
+
+
+**Table 2**. This table shows the species that have decreased drastically in abundance since the 1880s.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(dec.table)
@@ -146,78 +216,10 @@ ggmap(mdi.map) +
 
 
 
-### Drastically Increasing Species
-
-
-**Table 2**. This table shows the species that have increased drastically in abundance since the 1880s.
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
-knitr::kable(inc.table)
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 5**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI.'}
-
-#BTBW
-ggmap(mdi.map) +
-  geom_point(data=BTBW,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#006699',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Black-throated Blue Warbler Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 6**. Blue Jay (*Cyanocitta cristata*) distribution across MDI.'}
-
-#BLJA
-ggmap(mdi.map) +
-  geom_point(data=BLJA,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black',
-             fill = '#0099FF',
-             stroke = 1,
-             alpha = 0.5) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Blue Jay Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 7**. Eastern Phoebe (*Sayornis phoebe*) distribution across MDI.'}
-
-#EAPH
-ggmap(mdi.map) +
-  geom_point(data=EAPH,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#996633',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Eastern Phoebe Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-
 ### All Decreasing Species
 
 
-**Table 3**. This table shows the species we know to have descreased in abundance since the 1880s. The frequency value 'migrant only' refers to the species not breeding on MDI and isn't specifically associated with migratory species.
+**Table 3**. This table shows the species we know to have descreased in abundance since the 1880s.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 freq.table.dec <- freq.table %>% 
@@ -228,15 +230,6 @@ knitr::kable(freq.table.dec)
 ```
 
 
-### Modern Species Not Recorded in the 1880s
-
-
-**Table 4**. This table shows the common and uncommon species that are reguarly seen on MDI in modern times, but were not recorded in the 1880s. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically.
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
-knitr::kable(modern.table)
-
-```
 
 
 ### Total Species List Changes

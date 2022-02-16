@@ -1,6 +1,61 @@
 common.name,scientific.name,frequency.1880,frequency.current,freq.changes
-Black-throated Blue Warbler,Setophaga caerulescens,rare,common,increased
+Black-throated Blue Warbler,Setophaga caerulescens,very rare,common,increased
 Blue Jay,Cyanocitta cristata,rare,common,increased
 Brown Creeper,Certhia americana,rare,common,increased
+Eastern Bluebird,Sialia sialis,very rare,uncommon,increased
 Eastern Phoebe,Sayornis phoebe,rare,common,increased
 Red Crossbill,Loxia curvirostra,rare,common,increased
+Red-tailed Hawk,Buteo jamaicensis,very rare,uncommon,increased
+Solitary Sandpiper,Tringa solitaria,rare,common,increased
+Black-bellied Plover,Pluvialis squatarola,not detected,uncommon,increased
+Blackpoll Warbler,Setophaga striata,not detected,uncommon,increased
+Canada Goose,Branta canadensis,not detected,common,increased
+Cape May Warbler,Setophaga tigrina,not detected,uncommon,increased
+Common Eider,Somateria mollissima,not detected,common,increased
+Common Grackle,Quiscalus quiscula,not detected,common,increased
+Common Merganser,Mergus merganser,not detected,common,increased
+Common Raven,Corvus corax,not detected,common,increased
+Cooper's Hawk,Accipiter cooperii,not detected,uncommon,increased
+Double-crested Cormorant,Nannopterum auritum,not detected,common,increased
+Eastern Towhee,Pipilo erythrophthalmus,not detected,common,increased
+Eastern Wood-Pewee,Contopus virens,not detected,common,increased
+European Starling,Sturnus vulgaris,not detected,uncommon,increased
+Gray Catbird,Dumetella carolinensis,not detected,common,increased
+Great Black-backed Gull,Larus marinus,not detected,common,increased
+Great Cormorant,Phalacrocorax carbo,not detected,uncommon,increased
+Great Crested Flycatcher,Myiarchus crinitus,not detected,uncommon,increased
+Great Egret,Ardea alba,not detected,uncommon,increased
+Green-winged Teal,Anas crecca,not detected,uncommon,increased
+Hooded Merganser,Lophodytes cucullatus,not detected,common,increased
+House Finch,Haemorhous mexicanus,not detected,common,increased
+House Sparrow,Passer domesticus,not detected,common,increased
+Laughing Gull,Leucophaeus atricilla,not detected,common,increased
+Least Flycatcher,Empidonax minimus,not detected,uncommon,increased
+Mallard,Anas platyrhynchos,not detected,common,increased
+Merlin,Falco columbarius,not detected,common,increased
+Mourning Dove,Zenaida macroura,not detected,common,increased
+Nelson's Sparrow,Ammospiza nelsoni,not detected,common,increased
+Northern Cardinal,Cardinalis cardinalis,not detected,common,increased
+Northern Gannet,Morus bassanus,not detected,common,increased
+Palm Warbler,Setophaga palmarum,not detected,uncommon,increased
+Peregrine Falcon,Falco peregrinus,not detected,common,increased
+Pileated Woodpecker,Dryocopus pileatus,not detected,common,increased
+Pine Warbler,Setophaga pinus,not detected,common,increased
+Red-necked Grebe,Podiceps grisegena,not detected,uncommon,increased
+Ring-billed Gull,Larus delawarensis,not detected,common,increased
+Rock Pigeon,Columba livia,not detected,common,increased
+Ruby-crowned Kinglet,Corthylio calendula,not detected,uncommon,increased
+Semipalmated Plover,Charadrius semipalmatus,not detected,common,increased
+Snowy Egret,Egretta thula,not detected,uncommon,increased
+Swamp Sparrow,Melospiza georgiana,not detected,common,increased
+Tennessee Warbler,Leiothlypis peregrina,not detected,uncommon,increased
+Tufted Titmouse,Baeolophus bicolor,not detected,uncommon,increased
+Turkey Vulture,Cathartes aura,not detected,common,increased
+Veery,Catharus fuscescens,not detected,uncommon,increased
+White-breasted Nuthatch,Sitta carolinensis,not detected,common,increased
+White-winged Scoter,Melanitta deglandi,not detected,common,increased
+Wild Turkey,Meleagris gallopavo,not detected,common,increased
+Wilson's Storm-Petrel,Oceanites oceanicus,not detected,uncommon,increased
+Wood Duck,Aix sponsa,not detected,common,increased
+Wood Thrush,Hylocichla mustelina,not detected,common,increased
+Yellow-bellied Sapsucker,Sphyrapicus varius,not detected,uncommon,increased

@@ -1,90 +1,94 @@
 common.name,scientific.name,frequency.1880,frequency.current,frequency.changes
-Alder Flycatcher,Empidonax alnorum,common,common,stable
+Alder Flycatcher,Empidonax alnorum,common,common,no change
 American Bittern,Botaurus lentiginosus,rare,uncommon,increased
-American Black Duck,Anas rubripes,common,common,stable
-American Crow,Corvus brachyrhynchos,common,common,stable
-American Goldfinch,Spinus tristis,common,common,stable
-American Redstart,Setophaga ruticilla,common,common,stable
-American Robin,Turdus migratorius,common,common,stable
+American Black Duck,Anas rubripes,common,common,no change
+American Crow,Corvus brachyrhynchos,common,common,no change
+American Goldfinch,Spinus tristis,common,common,no change
+American Redstart,Setophaga ruticilla,common,common,no change
+American Robin,Turdus migratorius,common,common,no change
 American Woodcock,Scolopax minor,common,rare,decreased
-Bald Eagle,Haliaeetus leucocephalus,common,common,stable
+Bald Eagle,Haliaeetus leucocephalus,common,common,no change
 Bank Swallow,Riparia riparia,common,rare,decreased
-Barn Swallow,Hirundo rustica,common,common,stable
+Barn Swallow,Hirundo rustica,common,common,no change
 Barred Owl,Strix varia,uncommon,common,increased
 Bay-breasted Warbler,Setophaga castanea,common,uncommon,decreased
-Belted Kingfisher,Megaceryle alcyon,common,common,stable
-Black Guillemot,Cepphus grylle,common,common,stable
+Belted Kingfisher,Megaceryle alcyon,common,common,no change
+Black Guillemot,Cepphus grylle,common,common,no change
 Black Scoter,Melanitta americana,rare,uncommon,increased
-Black-and-white Warbler,Mniotilta varia,common,common,stable
+Black-and-white Warbler,Mniotilta varia,common,common,no change
 Black-billed Cuckoo,Coccyzus erythropthalmus,common,rare,decreased
-Black-capped Chickadee,Poecile atricapillus,common,common,stable
-Black-crowned Night-Heron,Nycticorax nycticorax,common,migrant/vagrant,decreased
-Black-legged Kittiwake,Rissa tridactyla,uncommon,migrant/vagrant,decreased
-Black-throated Blue Warbler,Setophaga caerulescens,rare,common,increased
-Black-throated Green Warbler,Setophaga virens,common,common,stable
-Blackburnian Warbler,Setophaga fusca,common,common,stable
+Black-capped Chickadee,Poecile atricapillus,common,common,no change
+Black-crowned Night-Heron,Nycticorax nycticorax,common,very rare,decreased
+Black-legged Kittiwake,Rissa tridactyla,uncommon,very rare,decreased
+Black-throated Green Warbler,Setophaga virens,common,common,no change
+Blackburnian Warbler,Setophaga fusca,common,common,no change
 Blue Jay,Cyanocitta cristata,rare,common,increased
-Blue-headed Vireo,Vireo solitarius,common,common,stable
-Bobolink,Dolichonyx oryzivorus,uncommon,uncommon,stable
+Blue-headed Vireo,Vireo solitarius,common,common,no change
+Bobolink,Dolichonyx oryzivorus,uncommon,uncommon,no change
 Bonaparte's Gull,Chroicocephalus philadelphia,uncommon,common,increased
-Boreal Chickadee,Poecile hudsonicus,rare,migrant/vagrant,decreased
-Broad-winged Hawk,Buteo platypterus,common,common,stable
+Boreal Chickadee,Poecile hudsonicus,rare,very rare,decreased
+Broad-winged Hawk,Buteo platypterus,common,common,no change
 Brown Creeper,Certhia americana,rare,common,increased
 Canada Warbler,Cardellina canadensis,common,rare,decreased
-Cedar Waxwing,Bombycilla cedrorum,common,common,stable
-Chestnut-sided Warbler,Setophaga pensylvanica,common,common,stable
+Cedar Waxwing,Bombycilla cedrorum,common,common,no change
+Chestnut-sided Warbler,Setophaga pensylvanica,common,common,no change
 Chimney Swift,Chaetura pelagica,common,rare,decreased
-Chipping Sparrow,Spizella passerina,common,common,stable
+Chipping Sparrow,Spizella passerina,common,common,no change
 Common Loon,Gavia immer,uncommon,common,increased
-Common Nighthawk,Chordeiles minor,common,common,stable
-Common Tern,Sterna hirundo,common,common,stable
-Common Yellowthroat,Geothlypis trichas,common,common,stable
-Dark-eyed Junco,Junco hyemalis,common,common,stable
-Downy Woodpecker,Dryobates pubescens,common,common,stable
-Eastern Bluebird,Sialia sialis,rare,uncommon,increased
+Common Nighthawk,Chordeiles minor,common,common,no change
+Common Tern,Sterna hirundo,common,common,no change
+Common Yellowthroat,Geothlypis trichas,common,common,no change
+Dark-eyed Junco,Junco hyemalis,common,common,no change
+Downy Woodpecker,Dryobates pubescens,common,common,no change
 Eastern Kingbird,Tyrannus tyrannus,uncommon,rare,decreased
 Eastern Phoebe,Sayornis phoebe,rare,common,increased
-Golden-crowned Kinglet,Regulus satrapa,common,common,stable
-Great Blue Heron,Ardea herodias,common,common,stable
-Hairy Woodpecker,Dryobates villosus,common,common,stable
-Hermit Thrush,Catharus guttatus,common,common,stable
-Herring Gull,Larus argentatus,common,common,stable
-Indigo Bunting,Passerina cyanea,rare,migrant/vagrant,decreased
-Leach's Storm-Petrel,Hydrobates leucorhous,rare,rare,stable
-Magnolia Warbler,Setophaga magnolia,common,common,stable
+Golden-crowned Kinglet,Regulus satrapa,common,common,no change
+Great Blue Heron,Ardea herodias,common,common,no change
+Greater Yellowlegs,Tringa melanoleuca,uncommon,common,increased
+Hairy Woodpecker,Dryobates villosus,common,common,no change
+Hermit Thrush,Catharus guttatus,common,common,no change
+Herring Gull,Larus argentatus,common,common,no change
+Indigo Bunting,Passerina cyanea,rare,very rare,decreased
+Leach's Storm-Petrel,Hydrobates leucorhous,rare,rare,no change
+Least Sandpiper,Calidris minutilla,common,common,no change
+Lesser Yellowlegs,Tringa flavipes,uncommon,common,increased
+Magnolia Warbler,Setophaga magnolia,common,common,no change
 Nashville Warbler,Leiothlypis ruficapilla,common,uncommon,decreased
-Northern Flicker,Colaptes auratus,common,common,stable
+Northern Flicker,Colaptes auratus,common,common,no change
 Northern Harrier,Circus hudsonius,rare,uncommon,increased
-Northern Parula,Setophaga americana,common,common,stable
-Northern Waterthrush,Parkesia noveboracensis,rare,rare,stable
-Osprey,Pandion haliaetus,common,common,stable
-Ovenbird,Seiurus aurocapilla,common,common,stable
-Pied-billed Grebe,Podilymbus podiceps,rare,migrant/vagrant,decreased
+Northern Parula,Setophaga americana,common,common,no change
+Northern Waterthrush,Parkesia noveboracensis,rare,rare,no change
+Osprey,Pandion haliaetus,common,common,no change
+Ovenbird,Seiurus aurocapilla,common,common,no change
+Pied-billed Grebe,Podilymbus podiceps,rare,very rare,decreased
 Pine Siskin,Spinus pinus,common,rare,decreased
-Purple Finch,Haemorhous purpureus,common,common,stable
+Purple Finch,Haemorhous purpureus,common,common,no change
 Red Crossbill,Loxia curvirostra,rare,common,increased
-Red-breasted Nuthatch,Sitta canadensis,common,common,stable
-Red-eyed Vireo,Vireo olivaceus,common,common,stable
-Red-tailed Hawk,Buteo jamaicensis,rare,uncommon,increased
+Red-breasted Nuthatch,Sitta canadensis,common,common,no change
+Red-eyed Vireo,Vireo olivaceus,common,common,no change
 Red-winged Blackbird,Agelaius phoeniceus,uncommon,common,increased
-Ring-necked Duck,Aythya collaris,rare,migrant/vagrant,decreased
-Ruby-throated Hummingbird,Archilochus colubris,common,common,stable
+Ring-necked Duck,Aythya collaris,rare,very rare,decreased
+Ruby-throated Hummingbird,Archilochus colubris,common,common,no change
+Ruddy Turnstone,Arenaria interpres,uncommon,rare,decreased
 Ruffed Grouse,Bonasa umbellus,common,rare,decreased
-Savannah Sparrow,Passerculus sandwichensis,common,common,stable
+Savannah Sparrow,Passerculus sandwichensis,common,common,no change
+Semipalmated Sandpiper,Calidris pusilla,common,common,no change
 Sharp-shinned Hawk,Accipiter striatus,uncommon,common,increased
-Song Sparrow,Melospiza melodia,common,common,stable
-Spotted Sandpiper,Actitis macularius,common,common,stable
-Swainson's Thrush,Catharus ustulatus,common,common,stable
-Tree Swallow,Tachycineta bicolor,common,common,stable
-Vesper Sparrow,Pooecetes gramineus,rare,rare,stable
-White-throated Sparrow,Zonotrichia albicollis,common,common,stable
+Short-billed Dowitcher,Limnodromus griseus,uncommon,rare,decreased
+Solitary Sandpiper,Tringa solitaria,rare,common,increased
+Song Sparrow,Melospiza melodia,common,common,no change
+Spotted Sandpiper,Actitis macularius,common,common,no change
+Swainson's Thrush,Catharus ustulatus,common,common,no change
+Tree Swallow,Tachycineta bicolor,common,common,no change
+Vesper Sparrow,Pooecetes gramineus,rare,rare,no change
+White-throated Sparrow,Zonotrichia albicollis,common,common,no change
 White-winged Crossbill,Loxia leucoptera,rare,uncommon,increased
-Wilson's Warbler,Cardellina pusilla,rare,rare,stable
-Winter Wren,Troglodytes hiemalis,common,common,stable
-Yellow Warbler,Setophaga petechia,common,common,stable
+Wilson's Warbler,Cardellina pusilla,rare,rare,no change
+Winter Wren,Troglodytes hiemalis,common,common,no change
+Yellow Warbler,Setophaga petechia,common,common,no change
 Yellow-bellied Flycatcher,Empidonax flaviventris,common,rare,decreased
-Yellow-rumped Warbler,Setophaga coronata,common,common,stable
-Eastern Whip-poor-will,Antrostomus vociferus,rare,migrant/vagrant,decreased
+Yellow-rumped Warbler,Setophaga coronata,common,common,no change
+Eastern Whip-poor-will,Antrostomus vociferus,rare,very rare,decreased
 Passenger Pigeon,Ectopistes migratorius,rare,extinct,decreased
-Cliff Swallow,Petrochelidon pyrrhonota,common,migrant/vagrant,decreased
-Purple Martin,Progne subis,rare,migrant/vagrant,decreased
+Cliff Swallow,Petrochelidon pyrrhonota,common,very rare,decreased
+Purple Martin,Progne subis,rare,very rare,decreased

@@ -15,6 +15,7 @@ library(ggmap)
 ####     Grabbing dataframes for analysis     ####
 #------------------------------------------------#
 
+##Type "1" in command line if to reactivate API token from Google Drive or enter 0 to obtain your own token linked to your account
 #Bring in the processed cs bird data from Google Drive
 drive_download((drive_find(pattern = 'csbirds_processed', n_max=1)), path = 'data/csbirds_processed_readin.csv', overwrite = TRUE)
 bird.his.analysis <- read.csv('data/csbirds_processed_readin.csv', header = TRUE)
@@ -47,7 +48,7 @@ bird.analysis$freq.y <- ifelse(bird.analysis$frequency.y == 'common', '1',
                                       ifelse(bird.analysis$frequency.y == 'rare', '3', '4')))
   
 #Create a column of frequency changes
-bird.analysis$freq.changes <- ifelse(bird.analysis$freq.x == bird.analysis$freq.y, 'stable', 
+bird.analysis$freq.changes <- ifelse(bird.analysis$freq.x == bird.analysis$freq.y, 'no change', 
                                     ifelse(bird.analysis$freq.y > bird.analysis$freq.x, 'increased', "decreased"))
 
 #Remove the migrant only species for now
@@ -96,9 +97,9 @@ freq.table['common.name'][freq.table['scientific.name'] == "Antrostomus vociferu
 freq.table['common.name'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'Cliff Swallow'
 freq.table['common.name'][freq.table['scientific.name'] == "Progne subis"] <- 'Purple Martin'
 freq.table['common.name'][freq.table['scientific.name'] == "Ectopistes migratorius"] <- 'Passenger Pigeon'
-freq.table['frequency.current'][freq.table['scientific.name'] == "Antrostomus vociferus"] <- 'migrant/vagrant'
-freq.table['frequency.current'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'migrant/vagrant'
-freq.table['frequency.current'][freq.table['scientific.name'] == "Progne subis"] <- 'migrant/vagrant'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Antrostomus vociferus"] <- 'very rare'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'very rare'
+freq.table['frequency.current'][freq.table['scientific.name'] == "Progne subis"] <- 'very rare'
 freq.table['frequency.current'][freq.table['scientific.name'] == "Ectopistes migratorius"] <- 'extinct'
 
 
@@ -136,14 +137,43 @@ bird.drastic2 <- bird.drastic %>%
   dplyr::select('common.name.x','scientific.name','frequency.y','frequency.x','freq.changes') %>% 
   rename('common.name'='common.name.x','frequency.1880'='frequency.y','frequency.current'='frequency.x')
 
-#Table for drastically increased species
-drastic.inc <- bird.drastic2 %>% 
+##Table for drastically increased species
+drastic.incr <- bird.drastic2 %>% 
   filter(bird.drastic2$freq.changes=='increased')
 
-#Table for drastically decreased species
+drastic.mod <- as.data.frame(rep("not detected", times = 52))
+drastic.mod.in <- as.data.frame(rep("increased", times = 52))
+colnames(drastic.mod) <- "frequency.1880"
+colnames(drastic.mod.in) <- "freq.changes"
+
+drastic.mod2 <- cbind(modern.table, drastic.mod)
+drastic.mod2 <- cbind(drastic.mod2, drastic.mod.in)
+
+drastic.mod2 <- drastic.mod2 %>% 
+  dplyr::select('common.name','scientific.name','frequency.1880','frequency','freq.changes') %>% 
+  rename('frequency.current'='frequency')
+
+drastic.inc <- rbind(drastic.incr, drastic.mod2)
+
+
+##Table for drastically decreased species
 drastic.dec <- bird.drastic2 %>% 
   filter(bird.drastic2$freq.changes=='decreased')
   
+missers1 <- c("Passenger Pigeon", "Ectopistes migratorius", "rare", "extinct",	"decreased")
+missers2 <- c("Cliff Swallow", "Petrochelidon pyrrhonota", "common", "very rare", "decreased")
+
+mat1 <- data.frame(t(sapply(missers1,c)))
+colnames(mat1) <- c("common.name",'scientific.name','frequency.1880','frequency.current','freq.changes')
+mat2 <- data.frame(t(sapply(missers2,c)))
+colnames(mat2) <- c("common.name",'scientific.name','frequency.1880','frequency.current','freq.changes')
+
+missers <- rbind(mat1, mat2)
+
+drastic.dec <- rbind(missers, drastic.dec) %>% 
+  doBy::order_by('common.name')
+
+
 
 
 ##Plot select species
