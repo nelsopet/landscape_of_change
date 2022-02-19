@@ -25,6 +25,11 @@ insect.his.analysis <- read.csv('data/proctorinsect_processed_readin.csv', heade
 drive_download((drive_find(pattern = 'inatinsect_processed', n_max=1)), path = 'data/inatinsect_processed_readin.csv', overwrite = TRUE)
 insect.mod.analysis <- read.csv('data/inatinsect_processed_readin.csv', header = TRUE)
 
+#Get a .png for the R Markdown from Google Drive
+drive_download((drive_find(pattern = 'LandscapeOfChange', n_max=1)), path = 'outputs/loc_logo.png')
+
+
+
 
 #------------------------------------------------#
 ####   Analysis and Creating visualizations   ####
@@ -70,57 +75,84 @@ insect.counts <- left_join(his.count, mod.count, by = 'family')
 
 #filter and rename
 insect.counts2 <- insect.counts %>% 
-  dplyr::select('order.x','super.family.x','family','Freq.x','Freq.y') %>% 
+  select('order.x','super.family.x','family','Freq.x','Freq.y') %>% 
   rename('order'='order.x','super.family'='super.family.x','frequency.1900s'='Freq.x','frequency.current'='Freq.y')
 
 #Fill in na with 0
 insect.counts2[is.na(insect.counts2)] <- 0
 
-#Final table for Rmd
-insect.table <- insect.counts2
 
 
-
-##Create dataframe for ggplot
+##Create data for ggplot and make the ggplot
 #Split modern
 insect.counts2b <- insect.counts2 %>% 
   select('family','frequency.current')
 
 #add column for time period and rename
-insect.counts.mod <- cbind(insect.counts2b, data.frame(rep(c('modern day'),times=54))) 
+insect.counts.mod <- cbind(insect.counts2b, data.frame(rep(c('modern day'), times=54))) 
 colnames(insect.counts.mod) <- c('family', 'freq', 'period')
-
 
 #Split historical
 insect.counts2c <- insect.counts2 %>% 
   select('family','frequency.1900s')
 
 #add column for time period and rename
-insect.counts.his <- cbind(insect.counts2c, data.frame(rep(c('historical'),times=54))) 
+insect.counts.his <- cbind(insect.counts2c, data.frame(rep(c('historical'), times=54))) 
 colnames(insect.counts.his) <- c('family', 'freq', 'period')
 
-
-
-##Join for final dataset
+#Join for final dataset
 insect.plot <- rbind(insect.counts.his, insect.counts.mod)
 
-
-##Create the ggplot
-png(filename="outputs/insect_freq_changes.png", width=1200, height=1500)
+#Create the ggplot
+png(filename="outputs/insect_freq_changes.png", width=5000, height=5000)
 
 insect.plot %>% 
   ggplot(aes(freq, family, fill = period)) +
-  geom_bar(stat="identity", color="black", width=.85, position=position_dodge()) +
-  ggtitle("Species Totals by Family") + 
+  geom_bar(stat="identity", color="black", width=.91, position=position_dodge()) +
+  ggtitle("Species Diversity by Family") + 
   labs(y = "Family", x = "Number of Species") +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,0), limits = c(0,300)) +
-  scale_fill_brewer(name="Legend", palette = 'Paired') +
-  theme_classic(base_size = 30) +
+  scale_fill_brewer(name="Legend", palette = 'Paired', direction = -1) +
+  theme_classic(base_size = 120) +
   scale_y_discrete(limits=rev) +
-  theme(plot.title = element_text(hjust = 0.5, size = 40), axis.text = element_text(size=20, color = "black"))
+  theme(plot.title = element_text(hjust = 0.5, size = 160), axis.text = element_text(size=65, color = "black"), legend.key.size = unit(2, 'cm'))
 
 dev.off()
 
+
+
+##Create dataframe for a table to see how many species from Proctor were recorded today
+#Left join by scientific name
+mod.proc <- left_join(insect.mod.analysis, insect.his.analysis, by = 'scientific.name') %>% 
+  select('order.x','order.y','super.family.x','family.x','genus.x','scientific.name','common.name') %>% 
+  rename('super.family'='super.family.x','family'='family.x','genus'='genus.x')
+
+
+##Create dataframe for looking at the species of Noctuidae, Geometridae, Torticidae, and Apidae
+#iNat data
+inat.sel <- insect.mod.analysis %>% 
+  filter(family=='Noctuidae' | family=="Tortricidae" | family=='Geometridae' | family=='Apidae')
+inat.sel <- inat.sel[order(inat.sel$family), ]
+
+#Proctor data
+proc.sel <- insect.his.analysis %>% 
+  filter(family=='Noctuidae' | family=="Tortricidae" | family=='Geometridae' | family=='Apidae') %>% 
+  select(-c('name.synonyms','locality'))
+proc.sel <- proc.sel[order(proc.sel$family), ]
+
+#Left join
+sel.fam.all <- left_join(inat.sel, proc.sel, by = 'scientific.name')
+
+length(which(sel.fam.all$order.y!='na')) #115 in common
+length(which(is.na(sel.fam.all$order.y))) #34 species not recored by proctor
+length(which(proc.sel$family=='Noctuidae')) #298, 21.9%
+length(which(inat.sel$family=='Noctuidae')) #63, 17.4%
+length(which(proc.sel$family=='Tortricidae')) #189 13.9%
+length(which(inat.sel$family=='Tortricidae')) #24 6.6%
+length(which(proc.sel$family=='Geometridae')) #186 13.7%
+length(which(inat.sel$family=='Geometridae')) #52 14.4%
+length(which(proc.sel$family=='Apidae')) #25 1.8%
+length(which(inat.sel$family=='Apidae')) #10 2.8%
 
 
 
@@ -128,6 +160,8 @@ dev.off()
 ####     Writing Out Files for R Markdown     ####
 #------------------------------------------------#
 
-###Write out dataframe for the bar graph
-write_csv(freq.plot, paste('outputs/frequency_plot_data', '.csv', sep=''))
+#Write out dataframe for the summary numbers and first table
+write_csv(mod.proc, paste('outputs/modernproctor_comparison_data', '.csv', sep=''))
 
+#Write out dataframe for the family fig
+#write_csv(insect.plot, paste('outputs/modernproctor_comparison_data', '.csv', sep=''))

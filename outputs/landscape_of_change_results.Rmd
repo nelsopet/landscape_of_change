@@ -9,9 +9,6 @@ output:
     theme: readable
 ---
 
-# Have Changes Occured Between 1880 and Now? {.tabset .tabset-fade .tabset-pills}
-## Birds
-
 ```{r setup, include=FALSE}
 require(knitr)
 require(utils)
@@ -19,6 +16,9 @@ require(dplyr)
 require(ggplot2)
 library(ggmap)
 library(tidyverse)
+library(graphics)
+library(cowplot)
+library(magick)
 
 freq.table <- read.csv('frequency_table_data.csv', header = TRUE)
 freq.plot <- read.csv('frequency_plot_data.csv', header = TRUE)
@@ -27,6 +27,11 @@ modern <- read.csv('modern_fulltable_data.csv', header = TRUE)
 dec.table <- read.csv('drasticdec_table_data.csv', header = TRUE)
 inc.table <- read.csv('drasticinc_table_data.csv', header = TRUE)
 bird.mod.locs <- read.csv('species_plotting_data.csv', header = TRUE)
+mod.proc <- read.csv('modernproctor_comparison_data.csv', header = TRUE)
+fam.comp <- ggdraw() +
+  draw_image("insect_freq_changes.png")
+logo <- ggdraw() +
+  draw_image("loc_logo.png")
 
 #Make separate data.frames for each species that is decreasing
 AMWO <- bird.mod.locs %>% 
@@ -56,23 +61,34 @@ mdi.map <- get_stamenmap(
 
 ```
 
+```{r echo=FALSE,  out.height='50%', out.width='50%'}
 
+plot(logo)
+
+```
+
+# Have Changes Occured Between 1880 and Now? {.tabset .tabset-fade .tabset-pills}
+
+
+
+## Birds
 
 ### Summary
 
-How have bird species populations changed from 1880 to now? Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird and iNaturalist data from 2018-2021. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 1** lists all species that were not recorded historically or were rare, but are now common or have increased greatly since the 1880s. When looking at the changes of the species recorded historically we do see a `r (round(((length(which(freq.table$frequency.changes=='decreased'))*100)/88), digits=2))`% decrease in these species (**Fiugre 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with noteable changes over the last 150 years. For a full list of changes to species see **Table 4**.
+How have bird species changed from 1880 to now? Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird and iNaturalist data from 2018-2021. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 1** lists all species that were not recorded historically or were rare, but are now common or have increased greatly since the 1880's. When looking at the changes of the species recorded historically we do see a `r (round(((length(which(freq.table$frequency.changes=='decreased'))*100)/88), digits=0))`% decrease in these species (**Figure 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with noteable changes over the last 150 years. For a full list of changes to species see **Table 4**.
 
 <br>
 
-### Bar Graph of Species Changes
+### Species Changes
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 1**. The bar graph shows changes in the species recorded by the Champlain Society in the 1880s.'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="**Figure 1**. The bar graph shows changes in the species recorded by the Champlain Society in the 1880's. All data was collected on Mount Desert Island, Maine, USA."}
 
 freq.plot %>% 
   ggplot(aes(freq.changes, species.number, fill = freq.changes)) +
   geom_bar(stat="identity", color="black") +
   ggtitle("Species Frequency Changes from 1880 to Present") + 
   geom_text(aes(label = species.number, vjust = 2)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 6), expand = c(0,0), limits = c(0,60)) +
   guides(fill = 'none') +
   labs(x = "Change in Frequency", y = "Number of Species") +
   theme_classic(base_size=14) +
@@ -85,12 +101,15 @@ freq.plot %>%
 
 ### Notably Increasing Species
 
-**Table 1**. This table shows the species that have increased drastically in abundance since the 1880s. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically.
+**Table 1**. This table shows the species that have increased drastically in abundance since the 1880's. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically. All data was collected on Mount Desert Island, Maine, USA.
+<details>
+  <summary>**Click to see the full table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(inc.table)
 
 ```
+</details>
 <br>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 5**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI.'}
 
@@ -154,12 +173,15 @@ ggmap(mdi.map) +
 
 ### Noteably Decreasing Species
 
-**Table 2**. This table shows the species that have decreased drastically in abundance since the 1880s.
+**Table 2**. This table shows the species that have decreased drastically in abundance since the 1880's. All data was collected on Mount Desert Island, Maine, USA.
+<details>
+  <summary>**Click to see the full table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(dec.table)
 
 ```
+</details>
 <br>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 2**. American Woodcock (*Scolopax minor*) distribution across MDI.'}
 
@@ -222,7 +244,9 @@ ggmap(mdi.map) +
 
 ### All Decreasing Species
 
-**Table 3**. This table shows the species we know to have descreased in abundance since the 1880s.
+**Table 3**. This table shows the species we know to have descreased in abundance since the 1880's. All data was collected on Mount Desert Island, Maine, USA.
+<details>
+  <summary>**Click to see the full table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 freq.table.dec <- freq.table %>% 
@@ -231,21 +255,23 @@ freq.table.dec <- freq.table %>%
 knitr::kable(freq.table.dec)
 
 ```
-
+</details>
 <br>
 
 ### Total Species List Changes
 
-**Table 5**. This table breaks down of all species recorded by the Champlain Society with their frquency status from the 1880s and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times.
+**Table 5**. This table breaks down of all species recorded by the Champlain Society with their frquency status from the 1880's and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times. All data was collected on Mount Desert Island, Maine, USA.
+<details>
+  <summary>**Click to see the full table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(freq.table)
 
 ```
-
+</details>
 <br>
 
-### Important Information
+### Methodological Information
 
 The historical dataset from the Champlain Society was collected from early July through the first week of September 1880-1883. To properly compare these data to modern day, we used eBird and iNaturalist data filtered to the same early July through the first week of Septemeber time frame, and to the same number of years (4) from 2018-2021. To compare how often these species were/are detected, we had to create a qualitative descriptor properly assinged to the species as the historical dataset did not allow for a quantitative analysis. These designations were assigned based on the Champlain Society's notes, and other sources describing bird abundance around that time. For the modern dataset we used a count of the number of times a species was reported and designated a category based on these bins: < 5 = 'very rare', 5 > 20 = 'rare', 20 > 50 = 'uncommon', > 50 = 'common.'
   
@@ -261,3 +287,42 @@ During the analysis, we compared these detection frequencies across modern and h
 
 
 ## Insects
+
+### Summary
+
+How have insects species changed from 1900 to now? To answer this question, we first delved into the efforts of the iNaturalist community and compared this to a historical collection of insects compiled by Proctor in the early 1900's. On the initial look at these data, there was a stark diffence between the two datasets. Proctor had collected 1360 species, while the iNaturalist community over the last 10 years only identified 362 species. A lot of can be contributed to the difference in methods, collection vs. the far less invasive photo documentation of iNaturalist. While iNaturalist methods are much safer and less invasive, there are limiations as many insects can only be identified to species in the hand with equipment such as loops, microscopes, etc. This means we need your help!! Community efforts by citizens scientists are invaluable and can accomplish documentation on scales matched by no other. In order to properly make inferences from the iNaturalist dataset, we need more effort in and around Acadia National Park to document more species that are present in the area.
+
+The modern iNaturalist community identified `r length(which(mod.proc$order.y!='na'))` of the 1360 species (`r round((((length(which(mod.proc$order.y!='na')))*100)/1360), digits=0)`%) that Proctor documented in the 1900's. Interestingly, the rest of those 362 species identified by the iNaturalist community (specificially `r length(which(is.na(mod.proc$order.y)))` species) were not recorded by Proctor's efforts (**Table 1**). This could mean that these species were not present in the early 1900's. 
+
+For those with in-depth insect taxonomy knowledge, **Figure 1** might be intruiging. For those who aren't well versed, lets take a closer look at the changes in the three most diverse families of Lepidoptera during the 1900's: Noctuidae, Tortricidae, and Geometridae respectively.  
+
+<br>
+
+### Modern Species not Recorded by Proctor
+
+**Table 1**. This table shows the `r length(which(is.na(mod.proc$order.y)))` species that the iNaturalist community identified over the past 10 years, that were not recorded by Proctor in the 1900s. All data was collected on Mount Desert Island, Maine, USA.
+<details>
+  <summary>**Click to see the full table**</summary>
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+  
+mod.not.proc <- mod.proc %>% 
+  filter(is.na(order.y)) %>% 
+  select('order.x','super.family','family','scientific.name','common.name') %>% 
+  rename('order'='order.x')
+
+knitr::kable(mod.not.proc)
+
+```
+</details>
+
+<br>
+
+### Comparisons by Insect Families
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='700%', out.height='700%', fig.align='center', fig.cap="**Figure 1**. Comparison of the number of species by family from modern iNaturalist data and historical data collected by Proctor in the 1900's. All data was collected on Mount Desert Island, Maine, USA."}
+
+plot(fam.comp)
+
+
+```
