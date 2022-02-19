@@ -1,7 +1,16 @@
 ---
-title: "Landscape of Change Results for Birds"
-output: html_document
+title: "Landscape of Change Results" 
+author: "Kyle A. Lima, Catherine Schmitt, Seth Benz, and Peter Nelson"
+date: "February, 2022"
+header-includes:
+    - \usepackage{setspace}\doublespacing
+output:
+  html_document:
+    theme: readable
 ---
+
+# Have Changes Occured Between 1880 and Now? {.tabset .tabset-fade .tabset-pills}
+## Birds
 
 ```{r setup, include=FALSE}
 require(knitr)
@@ -47,16 +56,15 @@ mdi.map <- get_stamenmap(
 
 ```
 
-## How have bird species populations changed from 1880 to now?
+
 
 ### Summary
 
-Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird data from 2018-2021. Since the effort of birders today is much more extensive than what could have been possible in the 1880's lets compare the species diversity of common species. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 4** lists all species that were not recorded historically, but are now common. But, when looking at the changes of the species recorded historically we do see a `r (length(which(freq.table$frequency.changes=='decreased'))*100)/88`% decrease in these species (**Fiugre 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with the most severe changes over the last 150 years. For a full list of changes to species see **Table 5**.
+How have bird species populations changed from 1880 to now? Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird and iNaturalist data from 2018-2021. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 1** lists all species that were not recorded historically or were rare, but are now common or have increased greatly since the 1880s. When looking at the changes of the species recorded historically we do see a `r (round(((length(which(freq.table$frequency.changes=='decreased'))*100)/88), digits=2))`% decrease in these species (**Fiugre 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with noteable changes over the last 150 years. For a full list of changes to species see **Table 4**.
 
+<br>
 
 ### Bar Graph of Species Changes
-
-
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 1**. The bar graph shows changes in the species recorded by the Champlain Society in the 1880s.'}
 
@@ -73,89 +81,17 @@ freq.plot %>%
 
 ```
 
+<br>
 
+### Notably Increasing Species
 
-
-### Drastically Decreasing Species
-
-
-**Table 1**. This table shows the species that have decreased drastically in abundance since the 1880s.
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
-knitr::kable(dec.table)
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 2**. American Woodcock (*Scolopax minor*) distribution across MDI.'}
-
-#AMWO
-ggmap(mdi.map) +
-  geom_point(data=AMWO,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#FF9933',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("American Woodcock Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 3**. Black-crowned Night-Heron (*Nycticorax nycticorax*) distribution across MDI.'}
-
-#BCNH
-ggmap(mdi.map) +
-  geom_point(data=BCNH,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#000000',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Black-crowned Night-Heron Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 4**. Yellow-bellied Flycatcher (*Empidonax flaviventris*) distribution across MDI.'}
-
-#YBFL
-ggmap(mdi.map) +
-  geom_point(data=YBFL,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#FFFF66',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Yellow-bellied Flycatcher Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-
-
-
-### Drastically Increasing Species
-
-
-**Table 2**. This table shows the species that have increased drastically in abundance since the 1880s.
+**Table 1**. This table shows the species that have increased drastically in abundance since the 1880s. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(inc.table)
 
 ```
-
+<br>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 5**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI.'}
 
 #BTBW
@@ -174,7 +110,7 @@ ggmap(mdi.map) +
   labs(x = "longitude", y = "latitude")
 
 ```
-
+<br>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 6**. Blue Jay (*Cyanocitta cristata*) distribution across MDI.'}
 
 #BLJA
@@ -193,7 +129,7 @@ ggmap(mdi.map) +
   labs(x = "longitude", y = "latitude")
 
 ```
-
+<br>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 7**. Eastern Phoebe (*Sayornis phoebe*) distribution across MDI.'}
 
 #EAPH
@@ -214,10 +150,79 @@ ggmap(mdi.map) +
 ```
 
 
+<br>
+
+### Noteably Decreasing Species
+
+**Table 2**. This table shows the species that have decreased drastically in abundance since the 1880s.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+knitr::kable(dec.table)
+
+```
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 2**. American Woodcock (*Scolopax minor*) distribution across MDI.'}
+
+#AMWO
+ggmap(mdi.map) +
+  geom_point(data=AMWO,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black', 
+             fill = '#FF9933',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("American Woodcock Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
+
+```
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 3**. Black-crowned Night-Heron (*Nycticorax nycticorax*) distribution across MDI.'}
+
+#BCNH
+ggmap(mdi.map) +
+  geom_point(data=BCNH,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black', 
+             fill = '#000000',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("Black-crowned Night-Heron Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
+
+```
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 4**. Yellow-bellied Flycatcher (*Empidonax flaviventris*) distribution across MDI.'}
+
+#YBFL
+ggmap(mdi.map) +
+  geom_point(data=YBFL,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black', 
+             fill = '#FFFF66',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("Yellow-bellied Flycatcher Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
+
+```
+
+<br>
+
 ### All Decreasing Species
 
-
-**Table 3**. This table shows the species we know to have descreased in abundance since the 1880s. The frequency value 'migrant only' refers to the species not breeding on MDI and isn't specifically associated with migratory species.
+**Table 3**. This table shows the species we know to have descreased in abundance since the 1880s.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 freq.table.dec <- freq.table %>% 
@@ -227,20 +232,9 @@ knitr::kable(freq.table.dec)
 
 ```
 
-
-### Modern Species Not Recorded in the 1880s
-
-
-**Table 4**. This table shows the common and uncommon species that are reguarly seen on MDI in modern times, but were not recorded in the 1880s. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically.
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
-knitr::kable(modern.table)
-
-```
-
+<br>
 
 ### Total Species List Changes
-
 
 **Table 5**. This table breaks down of all species recorded by the Champlain Society with their frquency status from the 1880s and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -249,3 +243,21 @@ knitr::kable(freq.table)
 
 ```
 
+<br>
+
+### Important Information
+
+The historical dataset from the Champlain Society was collected from early July through the first week of September 1880-1883. To properly compare these data to modern day, we used eBird and iNaturalist data filtered to the same early July through the first week of Septemeber time frame, and to the same number of years (4) from 2018-2021. To compare how often these species were/are detected, we had to create a qualitative descriptor properly assinged to the species as the historical dataset did not allow for a quantitative analysis. These designations were assigned based on the Champlain Society's notes, and other sources describing bird abundance around that time. For the modern dataset we used a count of the number of times a species was reported and designated a category based on these bins: < 5 = 'very rare', 5 > 20 = 'rare', 20 > 50 = 'uncommon', > 50 = 'common.'
+  
+During the analysis, we compared these detection frequencies across modern and historic times, and separated into their own tables (the 'Notably' increasing or decreasing tables) species with changes greater than one category less common or more common. So, for example if a species was common in the 1880s but is now uncommon, that would not fall into the notable changes. Whereas, if a species was common in the 1880s but is now rare, that would qualify as a noteably decreasing species. Considering the qualitative nature of our data with broad bins in which species were assigned, this makes it very difficult to distinguish fine scale details. So the larger the change the more confident we can be in saying that the species trend we are observing is true.
+
+
+
+
+
+
+
+
+
+
+## Insects
