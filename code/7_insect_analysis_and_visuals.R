@@ -131,12 +131,16 @@ mod.proc <- left_join(insect.mod.analysis, insect.his.analysis, by = 'scientific
 ##Create dataframe for looking at the species of Noctuidae, Geometridae, Torticidae, and Apidae
 #iNat data
 inat.sel <- insect.mod.analysis %>% 
-  filter(family=='Noctuidae' | family=="Tortricidae" | family=='Geometridae' | family=='Apidae')
+  filter(family=='Noctuidae' | family=="Sphingidae" | family=='Geometridae' | family=='Apidae' | 
+           family=='Lycaenidae' | family=='Nymphalidae' | family=='Papilionidae' | family=='Pieridae' |
+           family=='Hesperiidae')
 inat.sel <- inat.sel[order(inat.sel$family), ]
 
 #Proctor data
 proc.sel <- insect.his.analysis %>% 
-  filter(family=='Noctuidae' | family=="Tortricidae" | family=='Geometridae' | family=='Apidae') %>% 
+  filter(family=='Noctuidae' | family=="Tortricidae" | family=='Geometridae' | family=='Apidae'| 
+           family=='Lycaenidae' | family=='Nymphalidae' | family=='Papilionidae' | family=='Pieridae' |
+           family=='Hesperiidae') %>% 
   select(-c('name.synonyms','locality'))
 proc.sel <- proc.sel[order(proc.sel$family), ]
 
@@ -145,16 +149,22 @@ sel.fam.all <- left_join(inat.sel, proc.sel, by = 'scientific.name')
 
 length(which(sel.fam.all$order.y!='na')) #115 in common
 length(which(is.na(sel.fam.all$order.y))) #34 species not recored by proctor
-length(which(proc.sel$family=='Noctuidae')) #298, 21.9%
-length(which(inat.sel$family=='Noctuidae')) #63, 17.4%
-length(which(proc.sel$family=='Tortricidae')) #189 13.9%
-length(which(inat.sel$family=='Tortricidae')) #24 6.6%
-length(which(proc.sel$family=='Geometridae')) #186 13.7%
-length(which(inat.sel$family=='Geometridae')) #52 14.4%
-length(which(proc.sel$family=='Apidae')) #25 1.8%
-length(which(inat.sel$family=='Apidae')) #10 2.8%
-
-
+# length(which(proc.sel$family=='Noctuidae')) #298, 21.9%
+# length(which(inat.sel$family=='Noctuidae')) #63, 17.4%
+# length(which(proc.sel$family=='Tortricidae')) #189 13.9%
+# length(which(inat.sel$family=='Tortricidae')) #24 6.6%
+# length(which(proc.sel$family=='Geometridae')) #186 13.7%
+# length(which(inat.sel$family=='Geometridae')) #52 14.4%
+# length(which(proc.sel$family=='Apidae')) #25 1.8%
+# length(which(inat.sel$family=='Apidae')) #10 2.8%
+# 
+# 
+# proc.noct <- proc.sel %>% 
+#   filter(family=='Noctuidae')
+# inat.noct <- inat.sel %>% 
+#   filter(family=='Noctuidae')
+# unique(proc.noct$genus)
+# unique(inat.noct$genus)
 
 #------------------------------------------------#
 ####     Writing Out Files for R Markdown     ####
@@ -163,5 +173,7 @@ length(which(inat.sel$family=='Apidae')) #10 2.8%
 #Write out dataframe for the summary numbers and first table
 write_csv(mod.proc, paste('outputs/modernproctor_comparison_data', '.csv', sep=''))
 
-#Write out dataframe for the family fig
-#write_csv(insect.plot, paste('outputs/modernproctor_comparison_data', '.csv', sep=''))
+#Write out dataframes for pollinator data
+write_csv(inat.sel, paste('outputs/inat_pollinator_data', '.csv', sep=''))
+write_csv(proc.sel, paste('outputs/proctor_pollinator_data', '.csv', sep=''))
+write_csv(sel.fam.all, paste('outputs/all_pollinator_data', '.csv', sep=''))

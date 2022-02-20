@@ -1,9 +1,7 @@
 ---
 title: "Landscape of Change Results" 
-author: "Kyle A. Lima, Catherine Schmitt, Seth Benz, and Peter Nelson"
+author: "Kyle Lima, Catherine Schmitt, Seth Benz, and Peter Nelson"
 date: "February, 2022"
-header-includes:
-    - \usepackage{setspace}\doublespacing
 output:
   html_document:
     theme: readable
@@ -20,6 +18,7 @@ library(graphics)
 library(cowplot)
 library(magick)
 
+#Read in data
 freq.table <- read.csv('frequency_table_data.csv', header = TRUE)
 freq.plot <- read.csv('frequency_plot_data.csv', header = TRUE)
 modern.table <- read.csv('modern_table_data.csv', header = TRUE)
@@ -28,10 +27,17 @@ dec.table <- read.csv('drasticdec_table_data.csv', header = TRUE)
 inc.table <- read.csv('drasticinc_table_data.csv', header = TRUE)
 bird.mod.locs <- read.csv('species_plotting_data.csv', header = TRUE)
 mod.proc <- read.csv('modernproctor_comparison_data.csv', header = TRUE)
+inat.poll <- read.csv('inat_pollinator_data.csv', header = TRUE)
+proc.poll <- read.csv('proctor_pollinator_data.csv', header = TRUE)
+all.poll <- read.csv('all_pollinator_data.csv', header = TRUE)
+
+
+#Draw images
 fam.comp <- ggdraw() +
   draw_image("insect_freq_changes.png")
 logo <- ggdraw() +
   draw_image("loc_logo.png")
+
 
 #Make separate data.frames for each species that is decreasing
 AMWO <- bird.mod.locs %>% 
@@ -43,6 +49,7 @@ YBFL <- bird.mod.locs %>%
 BCNH <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Black-crowned Night-Heron')
 
+
 #Make separate data.frames for each species that is increasing
 BTBW <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Black-throated Blue Warbler')
@@ -53,15 +60,16 @@ EAPH <- bird.mod.locs %>%
 BLJA <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Blue Jay')
 
+
 #MDI Map for species plots
 mdi.map <- get_stamenmap(
   bbox = c(left = -68.5, bottom = 44.17, right = -68.13, top = 44.5),
-  maptype = 'terrain',
+  maptype = 'toner-lite',
   zoom = 11)
 
 ```
 
-```{r echo=FALSE,  out.height='50%', out.width='50%'}
+```{r echo=FALSE, fig.align='center', out.height='50%', out.width='50%'}
 
 plot(logo)
 
@@ -81,7 +89,7 @@ How have bird species changed from 1880 to now? Bird species abundance and diver
 
 ### Species Changes
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="**Figure 1**. The bar graph shows changes in the species recorded by the Champlain Society in the 1880's. All data was collected on Mount Desert Island, Maine, USA."}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="**Figure 1**. This figure shows the number of bird species recorded by the Champlain Society in the 1880's that have increased, decreased, and showed no change in abundance from the 1880's to present day. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist."}
 
 freq.plot %>% 
   ggplot(aes(freq.changes, species.number, fill = freq.changes)) +
@@ -90,7 +98,7 @@ freq.plot %>%
   geom_text(aes(label = species.number, vjust = 2)) +
   scale_y_continuous(breaks = scales::pretty_breaks(n = 6), expand = c(0,0), limits = c(0,60)) +
   guides(fill = 'none') +
-  labs(x = "Change in Frequency", y = "Number of Species") +
+  labs(x = "change in frequency", y = "number of species") +
   theme_classic(base_size=14) +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_fill_manual(values=c("forestgreen", "darkslategray4", "darkorange3"))
@@ -101,70 +109,103 @@ freq.plot %>%
 
 ### Notably Increasing Species
 
-**Table 1**. This table shows the species that have increased drastically in abundance since the 1880's. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically. All data was collected on Mount Desert Island, Maine, USA.
+**Table 1**. This table shows the species that show noteable increases in abundance since the 1880's. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
+
+<br>
+
 <details>
-  <summary>**Click to see the full table**</summary>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(inc.table)
 
 ```
 </details>
+
 <br>
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 5**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI.'}
+<br>
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 2**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI. Data provided by eBird and iNaturalist.'}
 
 #BTBW
-ggmap(mdi.map) +
+map1 <- ggmap(mdi.map) +
   geom_point(data=BTBW,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#006699',
              stroke = 1,
              alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Black-throated Blue Warbler Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme_classic(base_size = 14) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x="", y="")
+
+map1b <- ggdraw() +
+  draw_image("BTBW.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map1)
+
+map1b
 
 ```
 <br>
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 6**. Blue Jay (*Cyanocitta cristata*) distribution across MDI.'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 3**. Blue Jay (*Cyanocitta cristata*) distribution across MDI. Data provided by eBird and iNaturalist.'}
 
 #BLJA
-ggmap(mdi.map) +
+map2 <- ggmap(mdi.map) +
   geom_point(data=BLJA,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black',
              fill = '#0099FF',
              stroke = 1,
              alpha = 0.5) +
   theme_classic(base_size = 14 ) +
-  ggtitle("Blue Jay Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map2b <- ggdraw() +
+  draw_image("BLJA.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map2)
+
+map2b
 
 ```
 <br>
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 7**. Eastern Phoebe (*Sayornis phoebe*) distribution across MDI.'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 4**. Eastern Phoebe (*Sayornis phoebe*) distribution across MDI. Data provided by eBird and iNaturalist.'}
 
 #EAPH
-ggmap(mdi.map) +
+map3 <- ggmap(mdi.map) +
   geom_point(data=EAPH,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#996633',
              stroke = 1,
              alpha = 0.6) +
   theme_classic(base_size = 14 ) +
-  ggtitle("Eastern Phoebe Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map3b <- ggdraw() +
+  draw_image("EAPH.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map3)
+
+map3b
 
 ```
 
@@ -173,70 +214,103 @@ ggmap(mdi.map) +
 
 ### Noteably Decreasing Species
 
-**Table 2**. This table shows the species that have decreased drastically in abundance since the 1880's. All data was collected on Mount Desert Island, Maine, USA.
+**Table 2**. This table shows the species that exhibited noteable decreases in abundance since the 1880's. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
+
+<br>
+
 <details>
-  <summary>**Click to see the full table**</summary>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(dec.table)
 
 ```
 </details>
+
 <br>
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 2**. American Woodcock (*Scolopax minor*) distribution across MDI.'}
+<br>
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 5**. American Woodcock (*Scolopax minor*) distribution across MDI. Data provided by eBird and iNaturalist.'}
 
 #AMWO
-ggmap(mdi.map) +
+map4 <- ggmap(mdi.map) +
   geom_point(data=AMWO,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#FF9933',
              stroke = 1,
              alpha = 0.6) +
   theme_classic(base_size = 14 ) +
-  ggtitle("American Woodcock Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map4b <- ggdraw() +
+  draw_image("AMWO.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map4)
+
+map4b
 
 ```
 <br>
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 3**. Black-crowned Night-Heron (*Nycticorax nycticorax*) distribution across MDI.'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 6**. Black-crowned Night-Heron (*Nycticorax nycticorax*) distribution across MDI. Data provided by eBird and iNaturalist.'}
 
 #BCNH
-ggmap(mdi.map) +
+map5 <- ggmap(mdi.map) +
   geom_point(data=BCNH,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#000000',
              stroke = 1,
              alpha = 0.6) +
   theme_classic(base_size = 14 ) +
-  ggtitle("Black-crowned Night-Heron Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map5b <- ggdraw() +
+  draw_image("BCNH.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map5)
+
+map5b
 
 ```
 <br>
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 4**. Yellow-bellied Flycatcher (*Empidonax flaviventris*) distribution across MDI.'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 7**. Yellow-bellied Flycatcher (*Empidonax flaviventris*) distribution across MDI. Data provided by eBird and iNaturalist.'}
 
 #YBFL
-ggmap(mdi.map) +
+map6 <- ggmap(mdi.map) +
   geom_point(data=YBFL,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#FFFF66',
              stroke = 1,
              alpha = 0.6) +
   theme_classic(base_size = 14 ) +
-  ggtitle("Yellow-bellied Flycatcher Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map6b <- ggdraw() +
+  draw_image("YBFL.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map6)
+
+map6b
 
 ```
 
@@ -244,9 +318,12 @@ ggmap(mdi.map) +
 
 ### All Decreasing Species
 
-**Table 3**. This table shows the species we know to have descreased in abundance since the 1880's. All data was collected on Mount Desert Island, Maine, USA.
+**Table 3**. This table shows the species we know to have descreased in abundance since the 1880's. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
+
+<br>
+
 <details>
-  <summary>**Click to see the full table**</summary>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 freq.table.dec <- freq.table %>% 
@@ -260,9 +337,12 @@ knitr::kable(freq.table.dec)
 
 ### Total Species List Changes
 
-**Table 5**. This table breaks down of all species recorded by the Champlain Society with their frquency status from the 1880's and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times. All data was collected on Mount Desert Island, Maine, USA.
+**Table 4**. This table breaks down of all species recorded by the Champlain Society with their frquency status from the 1880's and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
+
+<br>
+
 <details>
-  <summary>**Click to see the full table**</summary>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 knitr::kable(freq.table)
@@ -292,17 +372,20 @@ During the analysis, we compared these detection frequencies across modern and h
 
 How have insects species changed from 1900 to now? To answer this question, we first delved into the efforts of the iNaturalist community and compared this to a historical collection of insects compiled by Proctor in the early 1900's. On the initial look at these data, there was a stark diffence between the two datasets. Proctor had collected 1360 species, while the iNaturalist community over the last 10 years only identified 362 species. A lot of can be contributed to the difference in methods, collection vs. the far less invasive photo documentation of iNaturalist. While iNaturalist methods are much safer and less invasive, there are limiations as many insects can only be identified to species in the hand with equipment such as loops, microscopes, etc. This means we need your help!! Community efforts by citizens scientists are invaluable and can accomplish documentation on scales matched by no other. In order to properly make inferences from the iNaturalist dataset, we need more effort in and around Acadia National Park to document more species that are present in the area.
 
-The modern iNaturalist community identified `r length(which(mod.proc$order.y!='na'))` of the 1360 species (`r round((((length(which(mod.proc$order.y!='na')))*100)/1360), digits=0)`%) that Proctor documented in the 1900's. Interestingly, the rest of those 362 species identified by the iNaturalist community (specificially `r length(which(is.na(mod.proc$order.y)))` species) were not recorded by Proctor's efforts (**Table 1**). This could mean that these species were not present in the early 1900's. 
+The modern iNaturalist community identified `r length(which(mod.proc$order.y!='na'))` of the 1360 species (`r round((((length(which(mod.proc$order.y!='na')))*100)/1360), digits=0)`%) that Proctor documented in the 1900's. Interestingly, the rest of those 362 species identified by the iNaturalist community (specificially `r length(which(is.na(mod.proc$order.y)))` species) were not recorded by Proctor's efforts were likely not present in the early 1900's (**Table 1**). For a full look at the species diversity between all families, see **Figure 1**.
 
-For those with in-depth insect taxonomy knowledge, **Figure 1** might be intruiging. For those who aren't well versed, lets take a closer look at the changes in the three most diverse families of Lepidoptera during the 1900's: Noctuidae, Tortricidae, and Geometridae respectively.  
+We also wanted to look more specifically at pollinating insects, and we saw a similar trend to the total dataset. There were `r length(unique(inat.poll$scientific.name))` pollinating species recorded by iNaturalist, and `r length(unique(proc.poll$scientific.name))` recorded by Proctor. iNaturalist recorded `r length(which(all.poll$order.y!='na'))` of the `r length(unique(proc.poll$scientific.name))` pollinating species (only `r round((((length(which(all.poll$order.y!='na')))*100)/1360), digits=0)`%) that Proctor documented. iNaturalist also identified `r length(which(is.na(all.poll$order.y)))` species that were not recorded by Proctor (**Table 2**). 
 
 <br>
 
 ### Modern Species not Recorded by Proctor
 
-**Table 1**. This table shows the `r length(which(is.na(mod.proc$order.y)))` species that the iNaturalist community identified over the past 10 years, that were not recorded by Proctor in the 1900s. All data was collected on Mount Desert Island, Maine, USA.
+**Table 1**. This table shows the `r length(which(is.na(mod.proc$order.y)))` species that the iNaturalist community identified over the past 10 years, that were not recorded by Proctor in the 1900s. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
+
+<br>
+
 <details>
-  <summary>**Click to see the full table**</summary>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
   
@@ -318,9 +401,30 @@ knitr::kable(mod.not.proc)
 
 <br>
 
+**Table 2**. This table shows the `r length(which(is.na(all.poll$order.y)))` pollinating species that the iNaturalist community identified and were not recorded by Proctor in the 1900s. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
+
+<br>
+
+<details>
+  <summary>**Click to show table**</summary>
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+  
+all.not.proc <- all.poll %>% 
+  filter(is.na(order.y)) %>% 
+  select('order.x','super.family.x','family.x','scientific.name','common.name') %>% 
+  rename('order'='order.x', 'super.family'='super.family.x','family'='family.x')
+
+knitr::kable(all.not.proc)
+
+```
+</details>
+
+<br>
+
 ### Comparisons by Insect Families
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='700%', out.height='700%', fig.align='center', fig.cap="**Figure 1**. Comparison of the number of species by family from modern iNaturalist data and historical data collected by Proctor in the 1900's. All data was collected on Mount Desert Island, Maine, USA."}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='700%', out.height='700%', fig.align='center', fig.cap="**Figure 1**. Comparison of the number of species by family from modern iNaturalist data and historical data collected by Proctor in the 1900's. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service."}
 
 plot(fam.comp)
 

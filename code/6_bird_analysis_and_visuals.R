@@ -26,6 +26,14 @@ drive_download((drive_find(pattern = 'ebird_mappingloc', n_max=1)), path = 'data
 bird.mod.analysis <- read.csv('data/ebird_processed_readin.csv', header = TRUE)
 bird.mod.locs <- read.csv('data/ebird_mappingloc_readin.csv', header = TRUE)
 
+#Download JPEGS for Rmd
+drive_download((drive_find(pattern = 'BTBW', n_max=1)), path = 'outputs/BTBW.jpg')
+drive_download((drive_find(pattern = 'BLJA', n_max=1)), path = 'outputs/BLJA.jpg')
+drive_download((drive_find(pattern = 'EAPH', n_max=1)), path = 'outputs/EAPH.jpg')
+drive_download((drive_find(pattern = 'AMWO', n_max=1)), path = 'outputs/AMWO.jpg')
+drive_download((drive_find(pattern = 'BCNH', n_max=1)), path = 'outputs/BCNH.jpg')
+drive_download((drive_find(pattern = 'YBFL', n_max=1)), path = 'outputs/YBFL.jpg')
+
 
 
 #------------------------------------------------#
