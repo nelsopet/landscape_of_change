@@ -26,6 +26,10 @@ insect.his.analysis <- read.csv('data/proctorinsect_processed_readin.csv', heade
 drive_download((drive_find(pattern = 'inatinsect_processed', n_max=1)), path = 'data/inatinsect_processed_readin.csv', overwrite = TRUE)
 insect.mod.analysis <- read.csv('data/inatinsect_processed_readin.csv', header = TRUE)
 
+#Get bombus data for comparisons
+drive_download((drive_find(pattern = 'bombus_modern', n_max=1)), path = 'data/bombus_modern_readin.csv', overwrite = TRUE)
+bombus.mod <- read.csv('data/bombus_modern_readin.csv', header = TRUE)
+
 #Get a .png for the R Markdown from Google Drive
 drive_download((drive_find(pattern = 'LandscapeOfChange', n_max=1)), path = 'outputs/loc_logo.png')
 
@@ -129,7 +133,8 @@ dev.off()
 #Left join by scientific name
 mod.proc <- left_join(insect.mod.analysis, insect.his.analysis, by = 'scientific.name') %>% 
   select('order.x','order.y','super.family.x','family.x','genus.x','scientific.name','common.name') %>% 
-  rename('super.family'='super.family.x','family'='family.x','genus'='genus.x')
+  rename('super.family'='super.family.x','family'='family.x','genus'='genus.x') %>% 
+  order_by('super.family')
 
 
 ##Create dataframe for looking at the species of Noctuidae, Geometridae, Torticidae, and Apidae
@@ -170,6 +175,65 @@ length(which(is.na(sel.fam.all$order.y))) #34 species not recored by proctor
 # unique(proc.noct$genus)
 # unique(inat.noct$genus)
 
+
+
+
+###Create data frame for bombus table
+#Filter historic data for bombus
+bombus.his <- insect.his.analysis %>% 
+  filter(genus=='Bombus') %>% 
+  select('scientific.name') %>% 
+  filter(scientific.name!='Bombus fernaldae')
+
+#Add in common names
+bombus.his$common.name <- c('Rusty-patched bumble bee', "Ashton's cuckoo bumble bee", 'Two-spotted bumble bee',
+                            'Northern amber bumble bee', 'Lemon cuckoo-bumble bee', 'Yellowish cuckoo-bumble bee',
+                            'Confusing bumble bee', 'Tri-colored bumble bee', 'Yellow-banded bumble bee', 'Half-black bumble bee')
+
+##Remove the geometry column
+#Split into separate vectors
+bombus.mod.a <- as.data.frame(bombus.mod[,1])
+bombus.mod.b <- as.data.frame(bombus.mod[,2])
+
+#recombine and fix colnames
+bombus.mod2 <- cbind(bombus.mod.b, bombus.mod.a)
+colnames(bombus.mod2) <- c('scientific.name', 'common.name')
+
+##Make final table
+#Make columns for presence
+bombus.mod2$present.mod <- 'yes'
+bombus.his$present.1900 <- 'yes'
+
+#Combine
+bombus.comb <- full_join(bombus.his, bombus.mod2, by = 'scientific.name') %>% 
+  select('common.name.x','scientific.name','present.1900','present.mod') %>% 
+  rename('common.name'='common.name.x')
+
+#Fill in common names
+bombus.comb['common.name'][bombus.comb['scientific.name'] == "Bombus impatiens"] <- 'Common eastern bumble bee'
+bombus.comb['common.name'][bombus.comb['scientific.name'] == "Bombus sandersoni"] <- "Sanderson's bumble bee"
+
+
+#Fill na's to finalize
+bombus.comb[is.na(bombus.comb)] <- 'no'
+
+#Add iNaturalist bumbles
+inat.bombus <- insect.mod.analysis %>% 
+  filter(scientific.name=='Bombus griseocollis') %>% 
+  select('common.name','scientific.name')
+
+inat.bombus['common.name'][inat.bombus['scientific.name'] == "Bombus griseocollis"] <- 'Brown-belted bumble bee'
+inat.bombus$present.1900 <- 'no'
+inat.bombus$present.mod <- 'yes'
+
+bombus.comb2 <- rbind(bombus.comb, inat.bombus)
+  
+bombus.comb2 <- order_by(bombus.comb2, 'common.name')
+
+
+
+
+
 #------------------------------------------------#
 ####     Writing Out Files for R Markdown     ####
 #------------------------------------------------#
@@ -181,3 +245,7 @@ write_csv(mod.proc, paste('outputs/modernproctor_comparison_data', '.csv', sep='
 write_csv(inat.sel, paste('outputs/inat_pollinator_data', '.csv', sep=''))
 write_csv(proc.sel, paste('outputs/proctor_pollinator_data', '.csv', sep=''))
 write_csv(sel.fam.all, paste('outputs/all_pollinator_data', '.csv', sep=''))
+write_csv(bombus.comb2, paste('outputs/bombus_table_data', '.csv', sep=''))
+
+
+

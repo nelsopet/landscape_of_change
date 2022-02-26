@@ -31,7 +31,7 @@ mod.proc <- read.csv('modernproctor_comparison_data.csv', header = TRUE)
 inat.poll <- read.csv('inat_pollinator_data.csv', header = TRUE)
 proc.poll <- read.csv('proctor_pollinator_data.csv', header = TRUE)
 all.poll <- read.csv('all_pollinator_data.csv', header = TRUE)
-
+bombus.table <- read.csv('bombus_table_data.csv', header = TRUE)
 
 #Draw images
 fam.comp <- ggdraw() +
@@ -361,11 +361,13 @@ knitr::kable(freq.table, col.names = c('Common name', 'Scientific name', "R. a. 
 </details>
 <br>
 
-### Methodological Information
+### Notes on Methods
 
 The historical dataset from the Champlain Society was collected from early July through the first week of September 1880 – 1883. To properly compare these data to modern day, we used eBird and iNaturalist data filtered to the same early July through the first week of September time frame, and over the same number of years from 2018 – 2021. To compare how often these species were/are detected, we had to create a qualitative descriptor properly assigned to the species as the historical dataset did not allow for a quantitative analysis. These designations were assigned based on the Champlain Society’s notes, and other sources describing species abundance around that time. For the modern dataset we used a count of the number of times a species was reported and designated a category based on these bins: < 5 = ‘very rare’, 5 > 20 = ‘rare’, 20 > 50 = ‘uncommon’, > 50 = ‘common.’
 
 We used these detection frequencies to compare modern and historic times, and separated species with changes greater than one category into the ‘notably’ increasing or decreasing tables. For example, if a species was common in the 1880’s but is now uncommon, that would not constitute a notable change. Whereas, if a species was common in the 1880’s but is now rare, that would qualify as a notably decreasing species. We made this distinction considering the qualitative nature of our data with broad bins in which species were assigned, and on the basis that qualitative data like this should not be used to distinguish fine scale details.
+
+
 
 
 
@@ -385,9 +387,9 @@ How have insects species changed from 1900 to now? To answer this question, we f
 	
 The modern iNaturalist community identified `r round(((length(which(mod.proc$order.y!='na'))/1360)*100), digits = 0)`% (n = `r length(which(mod.proc$order.y!='na'))`) of the 1360 species that Proctor documented in the 1900’s. Interestingly, the rest of the 362 species identified by the iNaturalist community (`r length(which(is.na(mod.proc$order.y)))` species) were not recorded by Proctor’s efforts, and were likely not present in the early 1900’s (**Table 1**). For a full look at the species diversity between all families, see **Figure 1**.
 	
-We also wanted to look more specifically at pollinating insects, and we saw a similar trend to the total dataset. There were `r length(unique(inat.poll$scientific.name))` pollinating species recorded by iNaturalist, and `r length(unique(proc.poll$scientific.name))` recorded by Proctor. iNaturalist recorded only `r round(((length(which(all.poll$order.y!='na'))/1360)*100), digits=0)`% (n = `r length(which(all.poll$order.y!='na'))`) of the `r length(unique(proc.poll$scientific.name))` pollinating species that Proctor documented. iNaturalist also identified `r length(which(is.na(all.poll$order.y)))` pollinating species that were not recorded by Proctor (**Table 2**). To look a little closer at pollinators, we explored just the bumblebees (*Bombus spp.*). 
+We also wanted to look more specifically at a group of pollinating insects. To do so, we explored the bumblebees (*Bombus spp.*) to get a baseline of this important pollinator group. There were `r length(which(bombus.table$present.1900=='yes'))` species recorded by Proctor, and `r length(which(bombus.table$present.mod=='yes'))` species recorded today on MDI. However, the species turnover is where things get interesting. If you look at **Table 2** you can see the breakdown of when each species was present on MDI, and you'll notice that there are 4 species that Proctor identified and are no longer present on MDI. What is most notable about these species is that they are all cuckoo-bumble bees, a group of that invades other bumble bee colonies, kills the queen, and takes control of the workers. These species have been undergoing large-scale range reductions, and some of this can be attributed to their host species also decreasing. An example is the Ashton’s Cuckoo-Bumble Bee, and its host, the Rusty-patched Bumble Bee which is now federally endangered beacuse of its population loss (you can read more about this species in the next paragraph). Additionally, there are 3 species that we have documented today that were not collected by Proctor.
 
-Threatened and endangered species were another category we wanted to explore the status of on MDI. Historically, Proctor collected specimens of a Maine endangered species known as the [Edwards' Hairstreak](https://www.maine.gov/ifw/docs/endangered/edwardshairstreak_106_107.pdf) (*Satyrium edwardsii*). According to the MDIFW Endangered Species Program, this species today has only been found at three sites in southwestern Maine. The extensive reduction in abundance of this species can largely be attributed to the loss of their native habitat, pitch pine-scrub oak barrens, which have been reduced to less than 50% of their historic range (MDIFW Endangered Species Program, 2003).
+Threatened and endangered species were another category we wanted to explore the status of on MDI. Historically, Proctor collected specimens of a Maine endangered species known as the [Edwards' Hairstreak](https://www.maine.gov/ifw/docs/endangered/edwardshairstreak_106_107.pdf) (*Satyrium edwardsii*). According to the MDIFW Endangered Species Program, this species today has only been found at three sites in southwestern Maine. The extensive reduction in abundance of this species can largely be attributed to the loss of their native habitat, pitch pine-scrub oak barrens, which have been reduced to less than 50% of their historic range (MDIFW Endangered Species Program, 2003). A federally endangered species, the [Rusty-patched Bumble Bee](https://ecos.fws.gov/ecp/species/9383) (*Bombus affinis*) has experienced a similar fate as the Edwards' Hairstreak. This species was collected by Proctor in the early 1900's, and according to the U.S. Fish & Wildlife Service, was once widespread across most of the eastern United States. This species requires grasslands and prairies, a ecotype that has taken devastating losses due to degredation, fragmentation, and conversion to agriculture or development (U.S. Fish & Wildlife Service, 2021). Proctor once collected this species on MDI, but today the closest iNaturalist record of this species was in western New York in 1996.
 
 
 <br>
@@ -407,8 +409,7 @@ Threatened and endangered species were another category we wanted to explore the
 mod.not.proc <- mod.proc %>% 
   filter(is.na(order.y)) %>% 
   select('order.x','super.family','family','scientific.name','common.name') %>% 
-  rename('order'='order.x') %>% 
-  order_by('super.family')
+  rename('order'='order.x')
 
 knitr::kable(mod.not.proc, col.names = c('Order', 'Super family', 'Family', 'Scientific name', 'Common name'))
 
@@ -434,7 +435,8 @@ plot(fam.comp)
 
 ### Pollinators
 
-**Table 2**. This table shows the `r length(which(is.na(all.poll$order.y)))` pollinating species that the iNaturalist community identified and were not recorded by Proctor in the 1900s. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
+
+**Table 2**. This table shows just the bumble bee species that the iNaturalist community and Proctor identified, and when they were present on MDI. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
 
 <br>
 
@@ -442,13 +444,8 @@ plot(fam.comp)
   <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-  
-all.not.proc <- all.poll %>% 
-  filter(is.na(order.y)) %>% 
-  select('order.x','super.family.x','family.x','scientific.name','common.name') %>% 
-  rename('order'='order.x', 'super.family'='super.family.x','family'='family.x')
 
-knitr::kable(all.not.proc, col.names = c('Order', 'Super family', 'Family', 'Scientific name', 'Common name'))
+knitr::kable(bombus.table, col.names = c('Common name', 'Scientific name', 'Present 1900', 'Present Modern'))
 
 ```
 </details>
