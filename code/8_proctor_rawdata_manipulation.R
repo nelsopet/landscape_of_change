@@ -42,6 +42,11 @@ api.vouch13 <- dplyr::select(api.his.ALL, 24)
 
 ##Split and name columns
 #1
+api.vouch1[c('a', 'b', 'c', 'd', 'e')] <- 
+  str_split_fixed(api.vouch1$Voucher1, 'Colle', 5)
+api.vouch1 <- api.vouch1[,-1]
+
+
 api.vouch1[c('species.name.and.authority', 'collector', 'collection.date', 'collection.number', 'collection.location', 'catalog.number')] <- 
   str_split_fixed(api.vouch1$Voucher1, ';', 6)
 api.vouch1 <- api.vouch1[,-1]

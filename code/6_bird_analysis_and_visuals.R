@@ -11,6 +11,7 @@ require(doBy)
 library(ggmap)
 
 
+
 #------------------------------------------------#
 ####     Grabbing dataframes for analysis     ####
 #------------------------------------------------#
@@ -60,19 +61,41 @@ bird.analysis$freq.changes <- ifelse(bird.analysis$freq.x == bird.analysis$freq.
                                     ifelse(bird.analysis$freq.y > bird.analysis$freq.x, 'increased', "decreased"))
 
 #Remove the migrant only species for now
-bird.analysis2 <- bird.analysis %>% filter(freq.y < 4)
+bird.analysis2 <- bird.analysis #%>% filter(freq.y < 4)
 
 #Add in values for species that were not captured in modern spreadsheet
 bird.analysis2['freq.changes'][bird.analysis2['scientific.name'] == "Antrostomus vociferus"] <- 'decreased'
 bird.analysis2['freq.changes'][bird.analysis2['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'decreased'
 bird.analysis2['freq.changes'][bird.analysis2['scientific.name'] == "Progne subis"] <- 'decreased'
 bird.analysis2['freq.changes'][bird.analysis2['scientific.name'] == "Ectopistes migratorius"] <- 'decreased'
+bird.analysis2['freq.x'][bird.analysis2['scientific.name'] == "Antrostomus vociferus"] <- '5'
+bird.analysis2['freq.x'][bird.analysis2['scientific.name'] == "Petrochelidon pyrrhonota"] <- '5'
+bird.analysis2['freq.x'][bird.analysis2['scientific.name'] == "Progne subis"] <- '5'
+bird.analysis2['freq.x'][bird.analysis2['scientific.name'] == "Ectopistes migratorius"] <- '5'
 
 
 
 ##Plot
+#Change the data for the plot to only be for notable spp.
+freq.plot.pre <- bird.analysis2
+
+freq.plot.pre$freq.x <-as.numeric(freq.plot.pre$freq.x)
+freq.plot.pre$freq.y <-as.numeric(freq.plot.pre$freq.y)
+
+freq.plot.pre$math <- freq.plot.pre$freq.x - freq.plot.pre$freq.y
+freq.plot.pre$math <- gsub("-", "", freq.plot.pre$math)
+
+freq.plot.pre$notable <- ifelse(freq.plot.pre$math < 2, 'not dis', "notable")
+
+freq.plot.sub <- subset(freq.plot.pre, (freq.plot.pre$notable == 'notable'))
+freq.plot.sub2 <- subset(freq.plot.pre, (freq.plot.pre$notable != 'notable'))
+freq.plot.sub2$freq.changes <- "no change"
+
+freq.plot.ready <- rbind(freq.plot.sub2, freq.plot.sub)
+
+  
 #Create new dataframe to store the counts of each frequency change
-freq.plot <- bird.analysis2 %>% 
+freq.plot <- freq.plot.ready %>% 
   count(freq.changes) %>% 
   rename('species.number'='n') %>% 
   doBy::order_by('species.number')
@@ -118,7 +141,7 @@ modern <- right_join(bird.his.analysis, bird.mod.analysis, by = 'scientific.name
 
 #Filter correct data out
 modern2 <- modern[is.na(modern$common.name.x), ]   
-modern2 <- filter(modern2, modern2$frequency.y == 'common' | modern2$frequency.y == 'uncommon')
+modern2 <- filter(modern2, modern2$frequency.y == 'common' | modern2$frequency.y == 'uncommon' | modern2$frequency.y == 'rare')
 
 #Create final data for table
 modern.table <- modern2 %>% 
@@ -145,6 +168,8 @@ bird.drastic2 <- bird.drastic %>%
   dplyr::select('common.name.x','scientific.name','frequency.y','frequency.x','freq.changes') %>% 
   rename('common.name'='common.name.x','frequency.1880'='frequency.y','frequency.current'='frequency.x')
 
+
+
 ##Table for drastically increased species
 drastic.incr <- bird.drastic2 %>% 
   filter(bird.drastic2$freq.changes=='increased')
@@ -162,6 +187,7 @@ drastic.mod2 <- drastic.mod2 %>%
   rename('frequency.current'='frequency')
 
 drastic.inc <- rbind(drastic.incr, drastic.mod2)
+
 
 
 ##Table for drastically decreased species
@@ -313,6 +339,7 @@ ggmap(mdi.map) +
 #    color = 'blue',
 #    stroke = FALSE, fillOpacity = 1
 #  )
+
 
 
 

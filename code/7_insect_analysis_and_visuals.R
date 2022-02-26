@@ -8,6 +8,7 @@ require(tidyverse)
 require(ggplot2)
 require(dplyr)
 require(googledrive)
+require(foreign)
 
 select <- dplyr::select
 
@@ -28,6 +29,9 @@ insect.mod.analysis <- read.csv('data/inatinsect_processed_readin.csv', header =
 #Get a .png for the R Markdown from Google Drive
 drive_download((drive_find(pattern = 'LandscapeOfChange', n_max=1)), path = 'outputs/loc_logo.png')
 
+#Read in proctor mapping data
+map.1 <- read.dbf('data/apidae_proctor_1900s.dbf')
+map.2 <- read.dbf('data/lepidoptera_proctor_1900s.dbf')
 
 
 
