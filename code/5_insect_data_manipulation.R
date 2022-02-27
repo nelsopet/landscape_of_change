@@ -237,9 +237,50 @@ bombus.spl <- bombus.4[!duplicated(bombus.4$scientific.name), ] %>%
 ####      Manipulation of BioBlitz Data       ####
 #------------------------------------------------#
 
-
-
-
+# bb.all <- bioblitz.ALL %>% 
+#   filter(Order == 'Lepidoptera' | Order == 'Hymenoptera' & Family == 'Apidae') %>% 
+#   dplyr::select("UTMX","UTMY",'Order',"Family","Genus","Species") %>% 
+#   filter(Species!="sp." & Species!="sp" & Species!="sp./form" & Species!="sp.1" & Species!="sp.2" &
+#            Species!="undescribed sp. nr occultana and repertana" & Species!="new species nr. sedatana" &
+#            Species!="“non-argutiola”" & UTMX!='na') %>% 
+#   rename('x'="UTMX",'y'="UTMY",'order'='Order','family'="Family",'genus'="Genus",'species'="Species")
+# 
+# 
+# 
+# bb.all['species'][bb.all['genus'] == "Nematocampa"] <- 'resistaria'
+# 
+# x <- bb.all %>% 
+#   dplyr::select('x')
+# 
+# y <- bb.all %>% 
+#   dplyr::select('y')
+# 
+# x <- as.numeric(as.matrix(x))
+# 
+# y <- as.numeric(as.matrix(y))
+# 
+# points <- as.matrix(cbind(x, y))
+# 
+# v <- vect(points, crs="+proj=utm +zone=19 +datum=WGS84 +units=m")
+# 
+# ll <- project(v, "+proj=longlat +datum=WGS84")
+# 
+# lonlat <- geom(ll)[, c("x", "y")]
+# 
+# bb.fixed <- cbind(bb.all, lonlat) %>% 
+#   select(3:8) %>% 
+#   rename('longitude'='x', 'latitude'='y')
+# 
+# ##Filter within LOC polygon
+# pnts_sf2 <- st_as_sf(bb.fixed, coords = c('longitude','latitude'), crs = st_crs(loc.circle))
+# 
+# bb.all.2 <- pnts_sf2 %>% mutate(
+#   intersection = as.integer(st_intersects(geometry, loc.circle))
+#   , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+# ) 
+# 
+# #Filter by those records inside polygon
+# bb.all.3 <- filter(bb.all.2, intersection==1)
 
 
 

@@ -436,7 +436,7 @@ plot(fam.comp)
 ### Pollinators
 
 
-**Table 2**. This table shows just the bumble bee species that the iNaturalist community and Proctor identified, and when they were present on MDI. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
+**Table 2**. This table shows just the bumble bee species that modern day sources (iNaturalist, Acadia National Park BioBlitz, and Maine Bumble Bee Atlas) and Proctor identified, and when they were present on MDI. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
 
 <br>
 
@@ -445,7 +445,7 @@ plot(fam.comp)
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 
-knitr::kable(bombus.table, col.names = c('Common name', 'Scientific name', 'Present 1900', 'Present Modern'))
+knitr::kable(bombus.table, col.names = c('Common name', 'Scientific name', 'Present 1900', 'Present modern'))
 
 ```
 </details>
