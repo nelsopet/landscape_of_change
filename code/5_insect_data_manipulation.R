@@ -36,6 +36,7 @@ inat.taxon <- read.csv('data/inat_taxonomy_20220130.csv', header = TRUE)
 bombus.ALL <- read_excel('data/ACAD_bombus_synthesis.xlsx', sheet = 2)
 bioblitz.ALL <- read_excel('data/acadia_bioblitz_data.xlsx', sheet = 1)
 bioblitz.sites.AL <- read_excel('data/bioblitz_sites_2010.xls', sheet = 1)
+his.specimen.ALL <- read.csv('data/historicspecimen_rawdata_readin.csv', header = TRUE)
 
 #Read in shapefile for filtering data
 loc.circle = read_sf("data/MDI_Circle.shp")
@@ -234,8 +235,15 @@ bombus.spl <- bombus.4[!duplicated(bombus.4$scientific.name), ] %>%
 
 
 #------------------------------------------------#
-####      Manipulation of BioBlitz Data       ####
+####     Manipulation for BBlitz Analysis     ####
 #------------------------------------------------#
+
+
+
+
+
+
+
 
 # bb.all <- bioblitz.ALL %>% 
 #   filter(Order == 'Lepidoptera' | Order == 'Hymenoptera' & Family == 'Apidae') %>% 

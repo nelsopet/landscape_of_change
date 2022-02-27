@@ -31,6 +31,7 @@ drive_download('lepidoptera_proctor_1900s.dbf', path = 'data/lepidoptera_proctor
 drive_download('ACAD_bombus_synthesis.xlsx', path = 'data/ACAD_bombus_synthesis.xlsx')
 drive_download('acadia_bioblitz_data.xlsx', path = 'data/acadia_bioblitz_data.xlsx')
 drive_download('bioblitz_sites_2010.xls', path = 'data/bioblitz_sites_2010.xls')
+drive_download((drive_find(pattern = 'historicspecimen_rawdata', n_max=1)), path = 'data/historicspecimen_rawdata_readin.csv', overwrite = TRUE)
 
 
 #Insect taxonomy
