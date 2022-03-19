@@ -8,7 +8,9 @@ require(tidyverse)
 require(ggplot2)
 require(dplyr)
 require(doBy)
-library(ggmap)
+require(ggmap)
+require(cowplot)
+
 
 
 
@@ -141,7 +143,7 @@ modern <- right_join(bird.his.analysis, bird.mod.analysis, by = 'scientific.name
 
 #Filter correct data out
 modern2 <- modern[is.na(modern$common.name.x), ]   
-modern2 <- filter(modern2, modern2$frequency.y == 'common' | modern2$frequency.y == 'uncommon' | modern2$frequency.y == 'rare')
+modern2 <- filter(modern2, modern2$frequency.y == 'common' | modern2$frequency.y == 'uncommon')
 
 #Create final data for table
 modern.table <- modern2 %>% 
@@ -235,9 +237,8 @@ BLJA <- bird.mod.locs %>%
 #Get base map
 mdi.map <- get_stamenmap(
   bbox = c(left = -68.5, bottom = 44.17, right = -68.13, top = 44.5),
-  maptype = 'terrain',
+  maptype = 'toner-lite',
   zoom = 11)
-
 
 #Plot
 #BTBW
@@ -345,7 +346,7 @@ ggmap(mdi.map) +
 
 #------------------------------------------------#
 ####     Writing Out Files for R Markdown     ####
-#------------------------------------------------##
+#-----------------------------------------------##
 
 ##Write out dataframe for the bar graph
 write_csv(freq.plot, paste('outputs/frequency_plot_data', '.csv', sep=''))
@@ -363,4 +364,192 @@ write_csv(drastic.inc, paste('outputs/drasticinc_table_data', '.csv', sep=''))
 
 ##Write out plotting file
 write_csv(bird.mod.locs, paste('outputs/species_plotting_data', '.csv', sep=''))
+
+
+
+#------------------------------------------------#
+####        Export Tables and Figures         ####
+#-----------------------------------------------##
+
+# #Figure 1
+# freq.plot.ex <- read.csv('outputs/frequency_plot_data.csv', header = TRUE)
+# 
+# png(filename="outputs/bird_figure_1.png", width=600, height=600)
+# freq.plot.ex %>% 
+#   ggplot(aes(freq.changes, species.number, fill = freq.changes)) +
+#   geom_bar(stat="identity", color="black") +
+#   ggtitle("Species Frequency Changes from 1880 to Present") + 
+#   geom_text(aes(label = species.number, vjust = 2)) +
+#   scale_y_continuous(breaks = scales::pretty_breaks(n = 6), expand = c(0,0), limits = c(0,80)) +
+#   guides(fill = 'none') +
+#   labs(x = "change in frequency", y = "number of species") +
+#   theme_classic(base_size=14) +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   scale_fill_manual(values=c("forestgreen", "darkslategray4", "darkorange3"))
+# dev.off()
+# 
+# #Figure 2
+# png(filename="outputs/bird_figure_2.png", width=1200, height=600)
+# map1 <- ggmap(mdi.map) +
+#   geom_point(data=BTBW,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black', 
+#              fill = '#006699',
+#              stroke = 1,
+#              alpha = 0.6) +
+#   theme_classic(base_size = 14) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x="", y="")
+# ggdraw() +
+#   draw_image("outputs/BTBW.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map1)
+# dev.off()
+# 
+# #Figure 3
+# png(filename="outputs/bird_figure_3.png", width=1200, height=600)
+# map2 <- ggmap(mdi.map) +
+#   geom_point(data=BLJA,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black',
+#              fill = '#0099FF',
+#              stroke = 1,
+#              alpha = 0.5) +
+#   theme_classic(base_size = 14 ) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x = "", y = "")
+# ggdraw() +
+#   draw_image("outputs/BLJA.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map2)
+# dev.off()
+# 
+# #Figure 4
+# png(filename="outputs/bird_figure_4.png", width=1200, height=600)
+# map3 <- ggmap(mdi.map) +
+#   geom_point(data=EAPH,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black', 
+#              fill = '#996633',
+#              stroke = 1,
+#              alpha = 0.6) +
+#   theme_classic(base_size = 14 ) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x = "", y = "")
+# ggdraw() +
+#   draw_image("outputs/EAPH.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map3)
+# dev.off()
+# 
+# #Figure 5
+# png(filename="outputs/bird_figure_5.png", width=1200, height=600)
+# map4 <- ggmap(mdi.map) +
+#   geom_point(data=AMWO,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black', 
+#              fill = '#FF9933',
+#              stroke = 1,
+#              alpha = 0.6) +
+#   theme_classic(base_size = 14 ) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x = "", y = "")
+# ggdraw() +
+#   draw_image("outputs/AMWO.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map4)
+# dev.off()
+# 
+# #Figure 6
+# png(filename="outputs/bird_figure_6.png", width=1200, height=600)
+# map5 <- ggmap(mdi.map) +
+#   geom_point(data=BCNH,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black', 
+#              fill = '#000000',
+#              stroke = 1,
+#              alpha = 0.6) +
+#   theme_classic(base_size = 14 ) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x = "", y = "")
+# ggdraw() +
+#   draw_image("outputs/BCNH.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map5)
+# dev.off()
+# 
+# #Figure 7
+# png(filename="outputs/bird_figure_7.png", width=1200, height=600)
+# map6 <- ggmap(mdi.map) +
+#   geom_point(data=YBFL,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black', 
+#              fill = '#FFFF66',
+#              stroke = 1,
+#              alpha = 0.6) +
+#   theme_classic(base_size = 14 ) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x = "", y = "")
+# ggdraw() +
+#   draw_image("outputs/YBFL.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map6)
+# dev.off()
+# 
+# #Table 1
+# inc.table <- drastic.inc
+# colnames(inc.table) <- c('Common name', 'Scientific name', "R. a. 1880's", 'R. a. modern', 'R. a. changes')
+# write_csv(inc.table, paste('outputs/bird_table_1', '.csv', sep=''))
+# 
+# #Table 2
+# dec.table <- drastic.dec
+# colnames(dec.table) <- c('Common name', 'Scientific name', "R. a. 1880's", 'R. a. modern', 'R. a. changes')
+# write_csv(dec.table, paste('outputs/bird_table_2', '.csv', sep=''))
+# 
+# #Table 3
+# colnames(modern.table) <- c('Common name', 'Scientific name', "Relative abundance")
+# write_csv(modern.table, paste('outputs/bird_table_3', '.csv', sep=''))
+# 
+# #Table 4
+# freq.table2 <- freq.table %>% 
+#   select(-c('frequency.changes'))
+# colnames(freq.table2) <- c('Common name', 'Scientific name', "R. a. 1880's", 'R. a. modern')
+# write_csv(freq.table2, paste('outputs/bird_table_4', '.csv', sep=''))
+
+
+
+
+
+
+
 

@@ -134,7 +134,8 @@ dev.off()
 mod.proc <- left_join(insect.mod.analysis, insect.his.analysis, by = 'scientific.name') %>% 
   select('order.x','order.y','super.family.x','family.x','genus.x','scientific.name','common.name') %>% 
   rename('super.family'='super.family.x','family'='family.x','genus'='genus.x') %>% 
-  order_by('super.family')
+  arrange('super.family')
+
 
 
 ##Create dataframe for looking at the species of Noctuidae, Geometridae, Torticidae, and Apidae
@@ -228,7 +229,8 @@ inat.bombus$present.mod <- 'yes'
 
 bombus.comb2 <- rbind(bombus.comb, inat.bombus)
   
-bombus.comb2 <- order_by(bombus.comb2, 'common.name')
+bombus.comb2 <- bombus.comb2 %>% 
+  arrange('common.name')
 
 
 
@@ -247,5 +249,27 @@ write_csv(proc.sel, paste('outputs/proctor_pollinator_data', '.csv', sep=''))
 write_csv(sel.fam.all, paste('outputs/all_pollinator_data', '.csv', sep=''))
 write_csv(bombus.comb2, paste('outputs/bombus_table_data', '.csv', sep=''))
 
+
+
+#------------------------------------------------#
+####        Export Tables and Figures         ####
+#------------------------------------------------#
+
+# #Table 1
+# mod.not.proc <- mod.proc %>% 
+#   filter(is.na(order.y)) %>% 
+#   select('order.x','super.family','family','scientific.name','common.name') %>% 
+#   rename('order'='order.x')
+# colnames(mod.not.proc) <- c('Order', 'Super family', 'Family', 'Scientific name', 'Common name')
+# mod.not.proc <- mod.not.proc %>% 
+#   arrange(desc(Order))
+# write_csv(mod.not.proc, paste('outputs/insect_table_1', '.csv', sep=''))
+# 
+# #Table 2
+# bombus.table <- bombus.comb2
+# colnames(bombus.table) <- c('Common name', 'Scientific name', 'Present 1900', 'Present modern')
+# write_csv(bombus.table, paste('outputs/insect_table_2', '.csv', sep=''))
+# 
+# #Figure 1 was already exported in the code above.
 
 
