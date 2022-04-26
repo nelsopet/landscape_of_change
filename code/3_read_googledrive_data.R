@@ -10,12 +10,11 @@ require(utils)
 
 
 #-----------------------------------------------------------------#
-####      Inputing Historical Raw Data from Google Drive       ####
+####      Inputting Historical Raw Data from Google Drive       ####
 #-----------------------------------------------------------------#
 
 ####IMPORTANT
-####Type "1" in command line if to reactivate KL's API token from Google Drive,
-#or enter 0 to obtain your own token linked to your account
+####You will have enter 0 to obtain your own token linked to your account
 
 
 #INSECTS
