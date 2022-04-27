@@ -1,6 +1,10 @@
 ---
-title: "Landscape of Change Results for Birds"
-output: html_document
+title: "Landscape of Change Results" 
+author: "Kyle Lima, Catherine Schmitt, Seth Benz, and Peter Nelson"
+date: "February, 2022"
+output:
+  html_document:
+    theme: readable
 ---
 
 ```{r setup, include=FALSE}
@@ -8,9 +12,14 @@ require(knitr)
 require(utils)
 require(dplyr)
 require(ggplot2)
-library(ggmap)
-library(tidyverse)
+require(ggmap)
+require(tidyverse)
+require(graphics)
+require(cowplot)
+require(magick)
+require(doBy)
 
+#Read in data
 freq.table <- read.csv('frequency_table_data.csv', header = TRUE)
 freq.plot <- read.csv('frequency_plot_data.csv', header = TRUE)
 modern.table <- read.csv('modern_table_data.csv', header = TRUE)
@@ -18,6 +27,18 @@ modern <- read.csv('modern_fulltable_data.csv', header = TRUE)
 dec.table <- read.csv('drasticdec_table_data.csv', header = TRUE)
 inc.table <- read.csv('drasticinc_table_data.csv', header = TRUE)
 bird.mod.locs <- read.csv('species_plotting_data.csv', header = TRUE)
+mod.proc <- read.csv('modernproctor_comparison_data.csv', header = TRUE)
+inat.poll <- read.csv('inat_pollinator_data.csv', header = TRUE)
+proc.poll <- read.csv('proctor_pollinator_data.csv', header = TRUE)
+all.poll <- read.csv('all_pollinator_data.csv', header = TRUE)
+bombus.table <- read.csv('bombus_table_data.csv', header = TRUE)
+
+#Draw images
+fam.comp <- ggdraw() +
+  draw_image("insect_freq_changes.png")
+logo <- ggdraw() +
+  draw_image("loc_logo.png")
+
 
 #Make separate data.frames for each species that is decreasing
 AMWO <- bird.mod.locs %>% 
@@ -29,6 +50,7 @@ YBFL <- bird.mod.locs %>%
 BCNH <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Black-crowned Night-Heron')
 
+
 #Make separate data.frames for each species that is increasing
 BTBW <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Black-throated Blue Warbler')
@@ -39,213 +61,490 @@ EAPH <- bird.mod.locs %>%
 BLJA <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Blue Jay')
 
+
 #MDI Map for species plots
 mdi.map <- get_stamenmap(
   bbox = c(left = -68.5, bottom = 44.17, right = -68.13, top = 44.5),
-  maptype = 'terrain',
+  maptype = 'toner-lite',
   zoom = 11)
 
 ```
 
-## How have bird species populations changed from 1880 to now?
+```{r echo=FALSE, fig.align='center', out.height='50%', out.width='50%'}
 
-### Summary
+plot(logo)
 
-Bird species abundance and diversity has certainly changed between now and the 1880's when the Champlain Society was running field courses on Mount Desert Island (MDI). We compared the Champlain Society's species list that they kept over the 4 year duration they were active on MDI, to the past 4 years of eBird data from 2018-2021. Since the effort of birders today is much more extensive than what could have been possible in the 1880's lets compare the species diversity of common species. Today, there are `r length(which(modern$frequency.y=='common'))` common species on MDI, whereas in the early 1880's there were only `r length(which(modern$frequency.x=='common'))` common species. So, the diveristy of regularly occuring species has increased. **Table 4** lists all species that were not recorded historically, but are now common. But, when looking at the changes of the species recorded historically we do see a `r (length(which(freq.table$frequency.changes=='decreased'))*100)/88`% decrease in these species (**Fiugre 1**, **Table 3**). **Table 1** and **Table 2** highlight the species with the most severe changes over the last 150 years. For a full list of changes to species see **Table 5**.
+```
 
-
-### Bar Graph of Species Changes
-
+# Have Changes Occurred Between 1880 and Now? {.tabset .tabset-fade .tabset-pills}
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 1**. The bar graph shows changes in the species recorded by the Champlain Society in the 1880s.'}
+
+## Birds
+
+### Introduction
+
+In the 1880s, a group of Harvard students known as the Champlain Society spent summers on Mount Desert Island (MDI) conducting surveys of flora and fauna, including birds. Their records, preserved by the Mount Desert Island Historical Society, present an opportunity to evaluate changes in bird populations on the island, which is now home to Acadia National Park. North America has lost nearly [3 billion birds](https://www.birds.cornell.edu/home/bring-birds-back) in recent times. According to Rosenberg et al. (2019), this is a loss of 25% of all birds on the continent since 1970! This shocking decline in North America's bird population is an important reason why it’s so critical to study bird populations locally.
+
+This study's objective was to compare the Champlain Society’s records to the past 4 years of eBird and iNaturalist data for Mount Desert Island. Our goals were to determine: 1) how historically recorded species’ relative abundance changed over the last 140 years, 2) if new species are present on the island, and 3) what we hypothesize caused these changes in MDI bird populations.
+
+
+### Methods
+
+The historical data from the Champlain Society were collected from early July through the first week of September 1880 – 1883. To compare these data to modern day, we used eBird and iNaturalist data filtered to the same time frame (early July through the first week of September), and over the same number of years from 2018 – 2021. To compare how often these species were/are detected, we had to create a qualitative descriptor properly assigned to the species as the historical dataset did not allow for a quantitative analysis. These designations are found in the Champlain Society’s notes (Spelman 1941), are based on their own observations and experiences, and follow the convention of other national and regional bird lists of the period. For the modern dataset, we used a count of the number of times a species was reported and designated a category based on these bins: < 5 = very rare, 5 > 20 = rare, 20 > 50 = uncommon, > 50 = common. These standards are adapted from the American Birding Association (2022).
+
+We used these relative abundances to compare modern and historic times. Due to the qualitative nature of the data, we designated species with changes of **more than one category** into the "increasing" or "decreasing" tables. So, if a species was "common" in the 1880s but is now "uncommon", that would not constitute a decrease that we can be confident in. Whereas, if a species was "common" in the 1880s but is now "rare", that would qualify as a decreasing species because we are confident that a change of that magnitude is real. For example, Cliff Swallow was a historically "common" species but now is "very rare" on MDI, and therefore is decreasing. In contrast, Sharp-shinned Hawk was "uncommon" historically and is now "common", but this difference is not enough to determine if it is increasing and is therefore categorized as "no change."
+
+
+### Results 
+
+The Champlain Society recorded `r length(freq.table$scientific.name)` species, which is less than half (`r round(((length(freq.table$scientific.name)/length(modern$scientific.name))*100), digits = 0)`%) of the `r length(modern$scientific.name)` species recorded in modern times according to eBird and iNaturalist. The Champlain Society categorized `r length(which(modern$frequency.x=='common'))` species as common, while today there are `r length(which(modern$frequency.y=='common'))`. This is an increase of 35 common species over 140 years.
+
+When we examined the changes in relative abundance of historically observed bird species over the last 140 years, we found that `r freq.plot[1,2]`% of these species increased in relative abundance (**Table 1**), `r freq.plot[2,2]`% decreased (**Table 2**), and `r freq.plot[3,2]`% exhibited no change (**Figure 1**). **Table 1** also includes more notably increasing species that were not detected by the Champlain Society, but are now uncommon or common on MDI. Some examples of the `r freq.plot[1,2]`% of historic species that have increased are Black-throated Blue Warbler (**Figure 2**), Blue Jay (**Figure 3**), and Eastern Phoebe (**Figure 4**). Examples of the `r freq.plot[2,2]`% of historic species that have decreased are American Woodcock (**Figure 5**), Black-crowned Night-Heron (**Figure 6**), and Yellow-bellied Flycatcher (**Figure 7**).
+
+Modern day records show `r length(modern.table$scientific.name)` species not recorded by the Champlain Society, that are regularly documented by observers today (**Table 3**). Three of these species were introduced by humans between the 1880s and present day: House Sparrow, European Starling, and Rock Pigeon. For a complete list of relative abundance changes by species see **Table 4**.
+
+
+### Conclusion and Next Steps
+
+Of the species recorded by the Champlain Society that have increased in relative abundance, most can be explained by human-caused changes to the landscape. For example, human urbanization of natural landscapes is proposed to be the main reason for Blue Jay range expansion (Smith et al. 2020). Similar reasoning can be attributed to the Eastern Phoebe increase that we have seen. As modern infrastructure developed, bridges and structures have become more prominent, which has been linked to the range expansion of this species (Weeks Jr. 2020). Another cause for some of these species' local increases can be associated with European colonization. Black-throated Blue Warbler was likely driven out of MDI due to the extensive logging and associated changes to the forest leaving MDI with little appropriate habitat (Irland 1982). In more recent times forested ecosystems have regenerated allowing for Black-throated Blue Warbler to return to the region (Holmes et al. 2020).
+
+Similar changes in the landscape might explain those species that have decreased in relative abundance. For example, the American Woodcock has decreased due to the transition of farmlands to forest (McAuley 2020), while the Black-crowned Night-Heron decrease has been attributed to the loss of wetland habitats (Hothem et al. 2020). Additionally, species that breed in boreal landscapes such as Pine Siskin and Yellow-bellied Flycatcher show local declines due to boreal habitats disappearing from climate warming, habitat degradation, and logging (Price et al. 2013). 
+
+We also wanted to look more closely at the species present on MDI today, but not recorded historically by the Champlain Society’s efforts. These species are those whose ranges may have expanded or shifted north due to climate change or other factors, and those that can be attributed to human-caused changes on the landscape. This trend of climate changes and human manipulation of the landscape have had dramatic effects on the birds of MDI, but the effects are often species-specific and highly variable. Future research to explain the changes we saw might incorporate additional data sets, such as the Audubon Christmas Bird Count and Maine Breeding Bird Atlas, as well as analyze changes in Mount Desert Island habitat types and land cover.
+
+
+<br>
+
+
+### Species Changes
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="**Figure 1**. This figure shows the number of bird species recorded by the Champlain Society in the 1880s that have increased, decreased, and showed no change in relative abundance from the 1880's to present day. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist."}
 
 freq.plot %>% 
   ggplot(aes(freq.changes, species.number, fill = freq.changes)) +
   geom_bar(stat="identity", color="black") +
   ggtitle("Species Frequency Changes from 1880 to Present") + 
   geom_text(aes(label = species.number, vjust = 2)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 6), expand = c(0,0), limits = c(0,80)) +
   guides(fill = 'none') +
-  labs(x = "Change in Frequency", y = "Number of Species") +
+  labs(x = "change in frequency", y = "number of species") +
   theme_classic(base_size=14) +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_fill_manual(values=c("forestgreen", "darkslategray4", "darkorange3"))
 
 ```
 
+<br>
 
+### Increasing Species
 
+**Table 1**. This table shows the species recorded by the Champlain Society with notable increases in relative abundance. Also included are species with intensive increases in relative abundance that were not recorded in the 1880s by the Champlain Society. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI, and `r length(which(modern.table$frequency=='uncommon'))` uncommon species that were not present historically. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
 
-### Drastically Decreasing Species
+<br>
 
-
-**Table 1**. This table shows the species that have decreased drastically in abundance since the 1880s.
+<details>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-knitr::kable(dec.table)
+knitr::kable(inc.table, col.names = c('Common name', 'Scientific name', "R. a. 1880's", 'R. a. modern', 'R. a. changes'), caption = "'R. a.' = Relative abundance")
 
 ```
+</details>
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 2**. American Woodcock (*Scolopax minor*) distribution across MDI.'}
+<br>
+<br>
 
-#AMWO
-ggmap(mdi.map) +
-  geom_point(data=AMWO,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#FF9933',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("American Woodcock Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 3**. Black-crowned Night-Heron (*Nycticorax nycticorax*) distribution across MDI.'}
-
-#BCNH
-ggmap(mdi.map) +
-  geom_point(data=BCNH,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#000000',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Black-crowned Night-Heron Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 4**. Yellow-bellied Flycatcher (*Empidonax flaviventris*) distribution across MDI.'}
-
-#YBFL
-ggmap(mdi.map) +
-  geom_point(data=YBFL,
-             aes(x=longitude, y=latitude),
-             shape = 21,
-             size = 2.5,
-             color = 'black', 
-             fill = '#FFFF66',
-             stroke = 1,
-             alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Yellow-bellied Flycatcher Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
-
-```
-
-
-
-
-### Drastically Increasing Species
-
-
-**Table 2**. This table shows the species that have increased drastically in abundance since the 1880s.
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
-knitr::kable(inc.table)
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 5**. Black-throated Blue Warbler (*Setophaga caerulescens*) distribution across MDI.'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 2**. Black-throated Blue Warbler (*Setophaga caerulescens*) modern day distribution across MDI. Data provided by eBird and iNaturalist, 2018 - 2021.'}
 
 #BTBW
-ggmap(mdi.map) +
+map1 <- ggmap(mdi.map) +
   geom_point(data=BTBW,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#006699',
              stroke = 1,
              alpha = 0.6) +
-  theme_classic(base_size = 14 ) +
-  ggtitle("Black-throated Blue Warbler Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme_classic(base_size = 14) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x="", y="")
+
+map1b <- ggdraw() +
+  draw_image("BTBW.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map1)
+
+map1b
 
 ```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 6**. Blue Jay (*Cyanocitta cristata*) distribution across MDI.'}
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 3**. Blue Jay (*Cyanocitta cristata*) modern day distribution across MDI. Data provided by eBird and iNaturalist, 2018 - 2021.'}
 
 #BLJA
-ggmap(mdi.map) +
+map2 <- ggmap(mdi.map) +
   geom_point(data=BLJA,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black',
              fill = '#0099FF',
              stroke = 1,
              alpha = 0.5) +
   theme_classic(base_size = 14 ) +
-  ggtitle("Blue Jay Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map2b <- ggdraw() +
+  draw_image("BLJA.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map2)
+
+map2b
 
 ```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='**Figure 7**. Eastern Phoebe (*Sayornis phoebe*) distribution across MDI.'}
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 4**. Eastern Phoebe (*Sayornis phoebe*) modern day distribution across MDI. Data provided by eBird and iNaturalist, 2018 - 2021.'}
 
 #EAPH
-ggmap(mdi.map) +
+map3 <- ggmap(mdi.map) +
   geom_point(data=EAPH,
              aes(x=longitude, y=latitude),
              shape = 21,
-             size = 2.5,
+             size = 2,
              color = 'black', 
              fill = '#996633',
              stroke = 1,
              alpha = 0.6) +
   theme_classic(base_size = 14 ) +
-  ggtitle("Eastern Phoebe Distribution") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  labs(x = "longitude", y = "latitude")
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map3b <- ggdraw() +
+  draw_image("EAPH.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map3)
+
+map3b
 
 ```
 
 
-### All Decreasing Species
+<br>
 
+### Decreasing Species
 
-**Table 3**. This table shows the species we know to have descreased in abundance since the 1880s. The frequency value 'migrant only' refers to the species not breeding on MDI and isn't specifically associated with migratory species.
+**Table 2**. This table shows the species that exhibited notable decreases in relative abundance since the 1880s. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
+
+<br>
+
+<details>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-freq.table.dec <- freq.table %>% 
-  filter(freq.table$frequency.changes == 'decreased')
+knitr::kable(dec.table, col.names = c('Common name', 'Scientific name', "R. a. 1880's", 'R. a. modern', 'R. a. changes'), caption = "'R. a.' = Relative abundance")
 
-knitr::kable(freq.table.dec)
+```
+</details>
+
+<br>
+<br>
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 5**. American Woodcock (*Scolopax minor*) modern day distribution across MDI. Data provided by eBird and iNaturalist, 2018 - 2021.'}
+
+#AMWO
+map4 <- ggmap(mdi.map) +
+  geom_point(data=AMWO,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2,
+             color = 'black', 
+             fill = '#FF9933',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map4b <- ggdraw() +
+  draw_image("AMWO.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map4)
+
+map4b
+
+```
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 6**. Black-crowned Night-Heron (*Nycticorax nycticorax*) modern day distribution across MDI. Data provided by eBird and iNaturalist, 2018 - 2021.'}
+
+#BCNH
+map5 <- ggmap(mdi.map) +
+  geom_point(data=BCNH,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2,
+             color = 'black', 
+             fill = '#000000',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map5b <- ggdraw() +
+  draw_image("BCNH.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map5)
+
+map5b
+
+```
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap='**Figure 7**. Yellow-bellied Flycatcher (*Empidonax flaviventris*) modern day distribution across MDI. Data provided by eBird and iNaturalist, 2018 - 2021.'}
+
+#YBFL
+map6 <- ggmap(mdi.map) +
+  geom_point(data=YBFL,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2,
+             color = 'black', 
+             fill = '#FFFF66',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+  labs(x = "", y = "")
+
+map6b <- ggdraw() +
+  draw_image("YBFL.jpg",  x = 0.4, y = 0, scale = .4) +
+  draw_plot(map6)
+
+map6b
 
 ```
 
+<br>
 
-### Modern Species Not Recorded in the 1880s
+### Modern Species not Recorded Historically
 
+**Table 3**. This table shows the species that can be seen regularly (those with the relative frequencies of rare, uncommon, and common) on MDI, but were not documented in the 1880s by the Champlain Society's efforts.
 
-**Table 4**. This table shows the common and uncommon species that are reguarly seen on MDI in modern times, but were not recorded in the 1880s. From this, we can infer that these species have expanded their range likely as a result of cliamte change and landscape change. There are `r length(which(modern.table$frequency=='common'))` species that are now common on MDI that were not present historically, and `r length(which(modern.table$frequency=='uncommon'))` species that are uncommon but regular and were not present historically.
+<br>
+
+<details>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-knitr::kable(modern.table)
+knitr::kable(modern.table, col.names = c('Common name', 'Scientific name', "Relative abundance"))
 
 ```
+</details>
+
+<br>
 
 
 ### Total Species List Changes
 
+**Table 4**. This table depicts the species recorded by the Champlain Society with their relative abundance status from the 1880s contrasted with today's. Data collected on Mount Desert Island, Maine, USA, and provided by eBird and iNaturalist.
 
-**Table 5**. This table breaks down of all species recorded by the Champlain Society with their frquency status from the 1880s and today. If you look at the 'Changes in Frequency' column you can see how these species have changed from historic times.
+<br>
+
+<details>
+  <summary>**Click to show table**</summary>
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-knitr::kable(freq.table)
+freq.table <- freq.table %>% 
+  select(-c('frequency.changes'))
+
+knitr::kable(freq.table, col.names = c('Common name', 'Scientific name', "R. a. 1880's", 'R. a. modern'), caption = "'R. a.' = Relative abundance")
+
+```
+</details>
+<br>
+
+
+### References
+
+American Birding Association (2022). ABA Checklist; Checklist Codes. https://www.aba.org/aba-checklist/
+
+Holmes, R. T., S. A. Kaiser, N. L. Rodenhouse, T. S. Sillett, M. S. Webster, P. Pyle, and M. A. Patten (2020). Black-throated Blue Warbler (Setophaga caerulescens), version 1.0. In Birds of the World (P. G. Rodewald, Editor). Cornell Lab of Ornithology, Ithaca, NY, USA. https://doi.org/10.2173/bow.btbwar.01
+
+Hothem, R. L., B. E. Brussee, W. E. Davis Jr., A. Martínez-Vilalta, A. Motis, and G. M. Kirwan (2020). Black-crowned Night-Heron (Nycticorax nycticorax), version 1.0. In Birds of the World (S. M. Billerman, Editor). Cornell Lab of Ornithology, Ithaca, NY, USA. https://doi.org/10.2173/bow.bcnher.01
+
+Irland, L. C. (1982). Wildlands and woodlots: the story of New England's forests. Hanover, NH: Univ. Press of New England.
+
+McAuley, D. G., D. M. Keppie, and R. M. Whiting Jr. (2020). American Woodcock (Scolopax minor), version 1.0. In Birds of the World (A. F. Poole, Editor). Cornell Lab of Ornithology, Ithaca, NY, USA. https://doi.org/10.2173/bow.amewoo.01
+
+Price, D.T., R.I. Alfaro, K.J. Brown, M.D. Flannigan, R.A. Fleming, E.H. Hogg, et al. (2013).
+Anticipating the consequences of climate change for Canada's boreal forest ecosystems.
+Environ. Rev., 21, pp. 322-365
+
+Rosenberg, K.V., Dokter, A.M., Blancher, P.J., Sauer, J.R., Smith, A.C., Smith, P.A., Stanton, J.C., Panjabi, A., Helft, L., Parr, M., Marra, P.P. (2019). Decline of the North American avifauna. Science 366, 120–124.
+
+Smith, K. G., K. A. Tarvin, and G. E. Woolfenden (2020). Blue Jay (Cyanocitta cristata), version 1.0. In Birds of the World (A. F. Poole, Editor). Cornell Lab of Ornithology, Ithaca, NY, USA. https://doi.org/10.2173/bow.blujay.01
+
+Spelman, H. M. (1941). A list of the birds observed by the ornithological department of the Champlain Society during the summers of 1880-1-2-3. Unpublished manuscript in Acadia National Park archives.
+
+Weeks Jr., H. P. (2020). Eastern Phoebe (Sayornis phoebe), version 1.0. In Birds of the World (A. F. Poole, Editor). Cornell Lab of Ornithology, Ithaca, NY, USA. https://doi.org/10.2173/bow.easpho.01
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Insects
+
+### Introduction
+
+In the early 1900s, William Procter, a biologist associated with the Mount Desert Island Biological Laboratory, inventoried the insects of MDI over 30 field seasons. These records have been preserved by Acadia National Park archives, and were published in Volume 7 of the Biological Survey of the Mount Desert Region (1946). This, in a similar fashion to the Champlain Society's bird records, allowed for an opportunity to evaluate changes of insect diversity in and around Acadia National Park.
+
+We focused on two groups of insects that are generally known as pollinators: Butterflies (order Lepidoptera), and Bees (family Apidae). Pollination is a critical ecosystem service performed by animals that 75% of the world’s plants rely on to reproduce (Natural Resource Council, 2007). This includes species of fruits, vegetables, and other plants that we rely upon for food, drugs, and oxygen (USDA 2021). However, these species are facing many threats such as parasites, pathogens, pesticides and environmental stressors that are causing major die-off of many pollinating insects (USDA 2021). 
+
+This study’s objective was to examine how the local Lepidoptera and Apidae insects have changed between the early 1900’s and present day. Our goals were to determine: 1) how well did Landscape of Change's citizen science efforts do in engaging the public to survey insects on MDI, 2) what species are no longer present that were recorded 100 years ago, and 3) what species are present today that were not recorded by Procter.
+
+
+### Methods
+
+Landscape of Change focuses broadly on two groups of insects that include pollinating species: family Apidae and order Lepidoptera. While the Landscape of Change citizen science project took place in 2021, a broader effort to crowdsource biodiversity data of the Downeast and Acadia Region using iNaturalist has been ongoing since 2012. To determine how well these efforts did in engaging citizen scientists to record these insects, we compared the number of species on MDI identified to species by the iNaturalist community 2012 - 2021, and compared this to a historical collection of insects compiled by Procter in the early 1900s (1927 - 1950 with a few earlier records). We used only iNaturalist records that were identified to species and labeled as Research Grade. We then compared these two data sets to examine species not recorded 100 years ago, and specific changes in threatened or endangered species.
+
+Acadia National Park has archives of all specimens collected in and around the park from historic times to modern day. This includes specimens from more intensive scientific surveys such as the Maine Bumble Bee Atlas, and bio-blitzes. We used this expanded dataset of bumble bees to get a better representation of insect changes in the region.
+
+
+### Results
+
+Between Lepidoptera and Apidae, Procter had collected 1,360 species, while the iNaturalist community over the last 10 years identified 362 species. The iNaturalist community identified `r round(((length(which(mod.proc$order.y!='na'))/1360)*100), digits = 0)`% (n = `r length(which(mod.proc$order.y!='na'))`) of the 1,360 species that Procter documented in the 1900s. This means there were `r length(which(is.na(mod.proc$order.y)))` species identified by the iNaturalist community that were not recorded by Procter’s efforts, and were likely not present in the early 1900s (**Table 1**). For a full look at the species diversity between all families, see **Figure 1**.
+	
+We examined the bumble bees (*Bombus* spp.) to represent a group of pollinating insects. There were `r length(which(bombus.table$present.1900=='yes'))` species recorded by Procter, and `r length(which(bombus.table$present.mod=='yes'))` species recorded today on MDI. However, there are only six species in common between historic and modern times. Procter identified four species that are no longer present on MDI: three of which are cuckoo-bumble bees, and the other is the Rusty-patched Bumble Bee (**Table 2**). Additionally, there are three species that we have documented today that were not collected by Procter: Brown-belted Bumble Bee, Common Eastern Bumble Bee, and Sanderson’s Bumble Bee (**Table 2**).
+
+Threatened and endangered species were another category we wanted to explore the status of on MDI. There were two species recorded that are currently listed as either state or federally threatened or endangered. Historically, Procter collected specimens of a Maine endangered species known as the [Edwards' Hairstreak](https://www.maine.gov/ifw/docs/endangered/edwardshairstreak_106_107.pdf) (*Satyrium edwardsii*). Today, this species is barely found at 3 sites throughout the entire state of Maine. Another species, the federally endangered [Rusty-patched Bumble Bee](https://ecos.fws.gov/ecp/species/9383) (*Bombus affinis*), has experienced a similar fate as the Edwards' Hairstreak. This species was collected by Procter in the early 1900's, and was once widespread across most of the eastern United States (U.S. Fish & Wildlife Service 2021). The Rusty-patched Bumble Bee has experienced large-scale range reductions and can no longer be found in most of the northeastern US.
+
+
+### Conclusions and Next Steps
+
+It is apparent that iNaturalist observers recorded dramatically fewer species than Procter, but much of this can be attributed to the difference in methods: Procter’s intensive and long-term specimen collection method vs. the casual and minimally invasive photo documentation of iNaturalist. Based on this analysis, we cannot conclude that a species found by Procter but not recorded in iNaturalist is absent or decreasing. We can, however, be confident in determining that species not found by Procter but documented in iNaturalist are present and increasing. It may be that closer examination of these species and the reasons for their range expansion might tell us something about the species we aren’t finding.While iNaturalist’s methods are much safer and less invasive, there are limitations as many insects can only be identified to species in the hand with equipment such as loupes, microscopes, etc. That said, we would not have the modern data set for comparison without community efforts by citizen scientists. Continued careful and extensive photographic evidence collected via iNaturalist can be subsidized with intensive, scientist-led bio-blitzes to get a better understanding of the insect populations of MDI.
+
+The bumble bees are a great example of pollinators to look into due to many researchers and projects focused on this group. Of the four species that are no longer found on MDI, three are cuckoo-bumble bees, a group that invades other bumble bee colonies, kills the queen, and takes control of the workers. These species have been undergoing large-scale range reductions, and some of this can be attributed to their host species also decreasing (Colla et al. 2012). An example is the Ashton’s Cuckoo-Bumble Bee, and its host, the Rusty-patched Bumble Bee which is now federally endangered because of its population loss (more on this species below). There were also three species of bumble bee that have become present on MDI since Procter was surveying the area. These three now occur here for various reasons. The Brown-belted Bumble Bee has been linked to human-developed land, increasing as planted meadows, roadsides, and urbanization have become more common (Novotny et al. 2021). Somewhat similarly, the Common Eastern Bumble Bee has shown impressive range expansion due to human introduction and commercialization of bumble bees (Palmier & Sheffield 2019). This species is also thought to be replacing species that have decreased due to landscape and climate change, such as the Rusty-patched Bumble Bee, due to its highly generalized habitat use (Palmier & Sheffield 2019). The Rusty-patched Bumble Bee has experienced large-scale range reductions, once having been present on MDI, but now cannot be found in the state of Maine (U.S. Fish & Wildlife Service, 2021). This species requires grasslands and prairies, an ecosystem that has taken devastating losses due to degradation, fragmentation, and conversion to industrial agriculture or development (U.S. Fish & Wildlife Service, 2021).
+
+According to the MDIFW Endangered Species Program (2003), the Edward’s Hairstreak has undergone a major range restriction and today has only been found at three sites in southwestern Maine. The extensive reduction in abundance of this species can largely be attributed to the loss of their native habitat, pitch pine-scrub oak barrens, which have been reduced to less than 50% of their historic range due to climate change and human development along the coast (MDIFW, 2003).
+
+Future research could incorporate additional data sets, such as bio-blitzes that were conducted from the early 2000s to 2016. The addition of these data will provide us with a more complete snapshot of what species are currently present on the island, and how we can make management recommendations to help the native insects of our region.
+
+
+
+<br>
+
+
+### Modern Species not Recorded by Procter
+
+**Table 1**. This table shows the `r length(which(is.na(mod.proc$order.y)))` species that the iNaturalist community identified over the past 10 years that were not recorded by Procter in the 1900s. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
+
+<br>
+
+<details>
+  <summary>**Click to show table**</summary>
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+  
+mod.not.proc <- mod.proc %>% 
+  filter(is.na(order.y)) %>% 
+  select('order.x','super.family','family','scientific.name','common.name') %>% 
+  rename('order'='order.x')
+
+knitr::kable(mod.not.proc, col.names = c('Order', 'Super family', 'Family', 'Scientific name', 'Common name'))
+
+```
+</details>
+
+
+<br>
+
+
+### Comparisons by Insect Families
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width='700%', out.height='700%', fig.align='center', fig.cap="**Figure 1**. Comparison of the number of species by family from modern iNaturalist data and historical data collected by Procter in the 1900's. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service."}
+
+plot(fam.comp)
+
 
 ```
 
+
+<br>
+
+
+### Pollinators
+
+
+**Table 2**. This table shows just the bumble bee species that modern day sources (iNaturalist, Acadia National Park BioBlitz, and Maine Bumble Bee Atlas) and Procter identified, and when they were present on MDI. Data collected on Mount Desert Island, Maine, USA, and provided by iNaturalist and the National Park Service.
+
+<br>
+
+<details>
+  <summary>**Click to show table**</summary>
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+knitr::kable(bombus.table, col.names = c('Common name', 'Scientific name', 'Present 1900', 'Present modern'))
+
+```
+</details>
+<br>
+
+
+### References
+
+Colla, S.R., Gadallah, F., Richardson, L. et al. (2012). Assessing declines of North American bumble bees (Bombus spp.) using museum specimens. Biodivers Conserv 21, 3585–3595. https://doi.org/10.1007/s10531-012-0383-2
+
+Maine Department of Inland Fisheries & Wildlife (MDIFW) (2003). State endangered: Edward’s Hairstreak (Satyrium edwardsii). https://www.maine.gov/ifw/docs/endangered/edwardshairstreak_106_107.pdf
+
+National Research Council (2007). Status of pollinators in North America. The National Academies Press.
+
+Novotny, J.L., Reeher, P., Varvaro, M. et al. (2021). Bumble bee species distributions and habitat associations in the Midwestern USA, a region of declining diversity. Biodivers Conserv 30, 865–887. https://doi.org/10.1007/s10531-021-02121-x
+
+Palmier, K. M., & Sheffield, C. S. (2019). First records of the Common Eastern Bumble Bee, Bombus impatiens Cresson (Hymenoptera: Apidae, Apinae, Bombini) from the Prairies Ecozone in Canada. Biodiversity data journal, (7), e30953. https://doi.org/10.3897/BDJ.7.e30953
+
+Procter, W. (1946). Biological survey of the Mount Desert Island region. Volume 7. The Wistar Institute of Anatomy and Biology, Philadelphia, US.
+
+USDA (2021). 2021 USDA annual strategic pollinator priorities and goals report.
+
+U.S. Fish & Wildlife Service (2021). Rusty patched bumble bee (Bombus affinis). Environmental Conservation Online System. https://ecos.fws.gov/ecp/species/9383
+
+
+<br>

@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/876924/2680b74f95d548da87d22b68fe74af07
+bundleId: https://api.rpubs.com/api/v1/document/876924/2680b74f95d548da87d22b68fe74af07
+url: http://rpubs.com/klima21/876924
+when: 1647089033.65238
+lastSyncTime: 1647089033.65239

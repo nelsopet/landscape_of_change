@@ -2,10 +2,12 @@ common.name,scientific.name,frequency.1880,frequency.current,freq.changes
 American Woodcock,Scolopax minor,common,rare,decreased
 Bank Swallow,Riparia riparia,common,rare,decreased
 Black-billed Cuckoo,Coccyzus erythropthalmus,common,rare,decreased
-Black-crowned Night-Heron,Nycticorax nycticorax,common,migrant/vagrant,decreased
-Black-legged Kittiwake,Rissa tridactyla,uncommon,migrant/vagrant,decreased
+Black-crowned Night-Heron,Nycticorax nycticorax,common,very rare,decreased
+Black-legged Kittiwake,Rissa tridactyla,uncommon,very rare,decreased
 Canada Warbler,Cardellina canadensis,common,rare,decreased
 Chimney Swift,Chaetura pelagica,common,rare,decreased
+Cliff Swallow,Petrochelidon pyrrhonota,common,very rare,decreased
+Passenger Pigeon,Ectopistes migratorius,rare,extinct,decreased
 Pine Siskin,Spinus pinus,common,rare,decreased
 Ruffed Grouse,Bonasa umbellus,common,rare,decreased
 Yellow-bellied Flycatcher,Empidonax flaviventris,common,rare,decreased

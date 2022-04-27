@@ -10,6 +10,7 @@ require(tidyverse)
 require(dplyr)
 require(lubridate)
 require(googledrive)
+require(sf)
 
 
 #------------------------------------------------#
@@ -30,6 +31,15 @@ lep.his.ALL <- read_excel('data/proctorinsect_rawdata_readin.xlsx', sheet = 1)
 
 ##Read in taxonomy data
 inat.taxon <- read.csv('data/inat_taxonomy_20220130.csv', header = TRUE)
+
+##Read in the extra data
+bombus.ALL <- read_excel('data/ACAD_bombus_synthesis.xlsx', sheet = 2)
+bioblitz.ALL <- read_excel('data/acadia_bioblitz_data.xlsx', sheet = 1)
+bioblitz.sites.AL <- read_excel('data/bioblitz_sites_2010.xls', sheet = 1)
+his.specimen.ALL <- read.csv('data/historicspecimen_rawdata_readin.csv', header = TRUE)
+
+#Read in shapefile for filtering data
+loc.circle = read_sf("data/MDI_Circle.shp")
 
 
 
@@ -192,6 +202,99 @@ im.species.list.final <- im.species.list.final %>%
 
 
 #------------------------------------------------#
+####     Manipulation of Bumble Bee Data      ####
+#------------------------------------------------#
+
+##Filter initial data
+bombus.1 <- bombus.ALL %>% 
+  dplyr::select(c('Scientific Name', 'Common Name', 'Lat (N)', 'Long (W)')) %>% 
+  rename('scientific.name'='Scientific Name', 'common.name'='Common Name', 'latitude'='Lat (N)', 
+         'longitude'='Long (W)')
+  
+
+##Filter within LOC polygon
+pnts_sf <- st_as_sf(bombus.1, coords = c('longitude', 'latitude'), crs = st_crs(loc.circle))
+
+bombus.2 <- pnts_sf %>% mutate(
+  intersection = as.integer(st_intersects(geometry, loc.circle))
+  , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+) 
+
+#Filter by those records inside polygon
+bombus.3 <- filter(bombus.2, intersection==1)
+
+#Make final
+bombus.4 <- bombus.3 %>% 
+  dplyr::select(c('scientific.name', 'common.name'))
+
+bombus.spl <- bombus.4[!duplicated(bombus.4$scientific.name), ] %>%
+  dplyr::select(c('common.name', 'scientific.name')) %>% 
+  filter(common.name!='UNK')
+
+
+
+
+#------------------------------------------------#
+####     Manipulation for BBlitz Analysis     ####
+#------------------------------------------------#
+
+
+
+
+
+
+
+
+# bb.all <- bioblitz.ALL %>% 
+#   filter(Order == 'Lepidoptera' | Order == 'Hymenoptera' & Family == 'Apidae') %>% 
+#   dplyr::select("UTMX","UTMY",'Order',"Family","Genus","Species") %>% 
+#   filter(Species!="sp." & Species!="sp" & Species!="sp./form" & Species!="sp.1" & Species!="sp.2" &
+#            Species!="undescribed sp. nr occultana and repertana" & Species!="new species nr. sedatana" &
+#            Species!="“non-argutiola”" & UTMX!='na') %>% 
+#   rename('x'="UTMX",'y'="UTMY",'order'='Order','family'="Family",'genus'="Genus",'species'="Species")
+# 
+# 
+# 
+# bb.all['species'][bb.all['genus'] == "Nematocampa"] <- 'resistaria'
+# 
+# x <- bb.all %>% 
+#   dplyr::select('x')
+# 
+# y <- bb.all %>% 
+#   dplyr::select('y')
+# 
+# x <- as.numeric(as.matrix(x))
+# 
+# y <- as.numeric(as.matrix(y))
+# 
+# points <- as.matrix(cbind(x, y))
+# 
+# v <- vect(points, crs="+proj=utm +zone=19 +datum=WGS84 +units=m")
+# 
+# ll <- project(v, "+proj=longlat +datum=WGS84")
+# 
+# lonlat <- geom(ll)[, c("x", "y")]
+# 
+# bb.fixed <- cbind(bb.all, lonlat) %>% 
+#   select(3:8) %>% 
+#   rename('longitude'='x', 'latitude'='y')
+# 
+# ##Filter within LOC polygon
+# pnts_sf2 <- st_as_sf(bb.fixed, coords = c('longitude','latitude'), crs = st_crs(loc.circle))
+# 
+# bb.all.2 <- pnts_sf2 %>% mutate(
+#   intersection = as.integer(st_intersects(geometry, loc.circle))
+#   , area = if_else(is.na(intersection), '', loc.circle$Name[intersection])
+# ) 
+# 
+# #Filter by those records inside polygon
+# bb.all.3 <- filter(bb.all.2, intersection==1)
+
+
+
+
+
+#------------------------------------------------#
 ####     Writing Out Processed .csv Files     ####
 #------------------------------------------------#
 
@@ -218,6 +321,11 @@ in.mod.locs <- function(x) {
   return(tail(insect, 1))
 }
 
+bombus <- function(x) {
+  insect <- basename(list.files(path = 'data/', pattern = 'bombus_modern_2')) 
+  return(tail(insect, 1))
+}
+
 ##File exporting
 ##Write out modern insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(im.species.list.final, paste('data/inatinsect_processed_', filedate, '.csv', sep=''))
@@ -230,4 +338,8 @@ in.mod.locs <- function(x) {
 ##Write out historic insect data as .csv and upload to google drive -- Commented out to stop repetition of downloads
 #write_csv(ih.species.list.final, paste('data/proctorinsect_processed_', filedate, '.csv', sep=''))
 #drive_upload(paste0('data/', insect.his.proc()), path = as_id(drive.output))
+
+##Write out Bombus data as .csv and upload to google drive -- Commented out to stop repetition of downloads
+#write_csv(bombus.spl, paste('data/bombus_modern_', filedate, '.csv', sep=''))
+#drive_upload(paste0('data/', bombus()), path = as_id(drive.output))
 

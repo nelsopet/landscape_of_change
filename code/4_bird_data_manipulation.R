@@ -165,45 +165,10 @@ bm.species.list4 <- merge(bm.freq, bm.species.list2, by = "common.name")
 #Now take the species list and add a column denoting species commonness
 bm.species.list4$frequency <- ifelse(bm.species.list4$"Freq">50, "common", "uncommon")
 bm.species.list4['frequency'][bm.species.list4["Freq"] <20] <- "rare"
-bm.species.list4['frequency'][bm.species.list4["Freq"] <5] <- "migrant/vagrant"
+bm.species.list4['frequency'][bm.species.list4["Freq"] <5] <- "very rare"
 
 #Reorder for ease of view
 bm.species.list5 <- bm.species.list4[c(1,3,2,4)]
-
-#Fix species that are marked incorrectly
-#Create function to pull row numbers and make them rare
-rare.ebird <- function(x) {
-  whatrow <- which(bm.species.list5$scientific.name=="Bubo virginianus" |
-                     bm.species.list5$scientific.name=="Canachites canadensis")
-  return(whatrow)
-}
-
-#Append those species' status to rare
-bm.species.list5$frequency <- replace(bm.species.list5$frequency, rare.ebird(), 'rare')
-
-
-#Create function to pull row numbers and make then migrant only
-mig.ebird <- function(x) {
-  whatrow <- which(bm.species.list5$scientific.name=="Tringa melanoleuca" |
-                     bm.species.list5$scientific.name=="Calidris minutilla" |
-                     bm.species.list5$scientific.name=="Calidris alba" |
-                     bm.species.list5$scientific.name=="Charadrius semipalmatus" |
-                     bm.species.list5$scientific.name=="Numenius phaeopus" |  
-                     bm.species.list5$scientific.name=="Arenaria interpres" |   
-                     bm.species.list5$scientific.name=="Calidris pusilla" |  
-                     bm.species.list5$scientific.name=="Limnodromus griseus" | 
-                     bm.species.list5$scientific.name=="Pluvialis squatarola" |
-                     bm.species.list5$scientific.name=="Phalaropus lobatus" |
-                     bm.species.list5$scientific.name=="Spizella pusilla" |
-                     bm.species.list5$scientific.name=="Tringa flavipes" |
-                     bm.species.list5$scientific.name=="Calidris fuscicollis" |
-                     bm.species.list5$scientific.name=="Tringa solitaria")
-  return(whatrow)
-}
-
-
-#Append those species' status to migrant only
-bm.species.list5$frequency <- replace(bm.species.list5$frequency, mig.ebird(), 'migrant/vagrant')
 
 ##Final output
 bm.species.list.final <- bm.species.list5 %>% 
@@ -263,7 +228,11 @@ uncommon.bird <- function(x) {
                      his.com.not$scientific.name=="Dolichonyx oryzivorus" |
                      his.com.not$scientific.name=="Gavia immer" |  
                      his.com.not$scientific.name=="Tyrannus tyrannus" |   
-                     his.com.not$scientific.name=="Agelaius phoeniceus" |  
+                     his.com.not$scientific.name=="Agelaius phoeniceus" |
+                     his.com.not$scientific.name=="Tringa melanoleuca" |
+                     his.com.not$scientific.name=="Tringa flavipes" |
+                     his.com.not$scientific.name=="Arenaria interpres" | 
+                     his.com.not$scientific.name=="Limnodromus griseus" |
                      his.com.not$scientific.name=="Accipiter striatus")
   return(whatrow)
 }
@@ -277,9 +246,7 @@ his.com.not$frequency <- replace(his.com.not$frequency, uncommon.bird(), 'uncomm
 rare.bird <- function(x) {
   whatrow <- which(his.com.not$scientific.name=="Botaurus lentiginosus" |
                      his.com.not$scientific.name=="Melanitta americana" |
-                     his.com.not$scientific.name=="Setophaga caerulescens" |
-                     his.com.not$scientific.name=="Cyanocitta cristata" |
-                     his.com.not$scientific.name=="Sialia sialis" |  
+                     his.com.not$scientific.name=="Cyanocitta cristata" |  
                      his.com.not$scientific.name=="Poecile hudsonicus" |   
                      his.com.not$scientific.name=="Certhia americana" | 
                      his.com.not$scientific.name=="Passerina cyanea" | 
@@ -289,13 +256,13 @@ rare.bird <- function(x) {
                      his.com.not$scientific.name=="Podilymbus podiceps" | 
                      his.com.not$scientific.name=="Progne subis" | 
                      his.com.not$scientific.name=="Loxia curvirostra" | 
-                     his.com.not$scientific.name=="Buteo jamaicensis" | 
                      his.com.not$scientific.name=="Aythya collaris" | 
                      his.com.not$scientific.name=="Pooecetes gramineus" | 
                      his.com.not$scientific.name=="Antrostomus vociferus" | 
                      his.com.not$scientific.name=="Loxia leucoptera" | 
                      his.com.not$scientific.name=="Hydrobates leucorhous" |
                      his.com.not$scientific.name=="Circus hudsonius" |
+                     his.com.not$scientific.name=="Tringa solitaria" |
                      his.com.not$scientific.name=="Cardellina pusilla")
   return(whatrow)
 }
@@ -307,20 +274,16 @@ his.com.not$frequency <- replace(his.com.not$frequency, rare.bird(), 'rare')
 ##Change frequency status for migrant species
 #Create function to pull row numbers
 mig.bird <- function(x) {
-  whatrow <- which(his.com.not$scientific.name=="Tringa melanoleuca" |
-                     his.com.not$scientific.name=="Calidris minutilla" |
-                     his.com.not$scientific.name=="Tringa flavipes" |
+  whatrow <- which(his.com.not$scientific.name=="Setophaga caerulescens" |
+                     his.com.not$scientific.name=="Sialia sialis" |  
+                     his.com.not$scientific.name=="Buteo jamaicensis" | 
                      his.com.not$scientific.name=="Clangula hyemalis" |
-                     his.com.not$scientific.name=="Calidris melanotos" |  
-                     his.com.not$scientific.name=="Arenaria interpres" |   
-                     his.com.not$scientific.name=="Calidris pusilla" |  
-                     his.com.not$scientific.name=="Limnodromus griseus" | 
-                     his.com.not$scientific.name=="Tringa solitaria")
+                     his.com.not$scientific.name=="Calidris melanotos")
   return(whatrow)
 }
 
 #Append those species' status to migrant only
-his.com.not$frequency <- replace(his.com.not$frequency, mig.bird(), 'migrant/vagrant')
+his.com.not$frequency <- replace(his.com.not$frequency, mig.bird(), 'very rare')
 
 
 #Merge this back with the bh.species.list
