@@ -5,6 +5,7 @@
 #------------------------------------------------#
 require(utils)
 require(tidyverse)
+require(googledrive)
 require(ggplot2)
 require(dplyr)
 require(doBy)
@@ -23,7 +24,7 @@ require(cowplot)
 drive_download((drive_find(pattern = 'csbirds_processed', n_max=1)), path = 'data/csbirds_processed_readin.csv', overwrite = TRUE)
 bird.his.analysis <- read.csv('data/csbirds_processed_readin.csv', header = TRUE)
 
-#Bring in the processed ebird data from Google Drive
+#Bring in the processed eBird data from Google Drive
 drive_download((drive_find(pattern = 'ebird_processed', n_max=1)), path = 'data/ebird_processed_readin.csv', overwrite = TRUE)
 drive_download((drive_find(pattern = 'ebird_mappingloc', n_max=1)), path = 'data/ebird_mappingloc_readin.csv', overwrite = TRUE)
 bird.mod.analysis <- read.csv('data/ebird_processed_readin.csv', header = TRUE)
@@ -134,6 +135,26 @@ freq.table['frequency.current'][freq.table['scientific.name'] == "Antrostomus vo
 freq.table['frequency.current'][freq.table['scientific.name'] == "Petrochelidon pyrrhonota"] <- 'very rare'
 freq.table['frequency.current'][freq.table['scientific.name'] == "Progne subis"] <- 'very rare'
 freq.table['frequency.current'][freq.table['scientific.name'] == "Ectopistes migratorius"] <- 'extinct'
+
+
+#Create table of the percent of each frequency status
+p.1880 <- freq.table %>%
+  as_tibble() %>% 
+  select(frequency = frequency.1880) %>% 
+  group_by(frequency) %>% 
+  summarise(percent.1880 = 100*(length(frequency)/98), .groups = "drop")
+
+p.curr <- freq.table %>%
+  as_tibble() %>% 
+  select(frequency = frequency.current) %>% 
+  group_by(frequency) %>% 
+  summarise(percent.current = 100*(length(frequency)/98), .groups = "drop")
+
+p.curr %>% 
+  left_join(p.1880, by = "frequency") %>% 
+  select("Frequency status" = frequency, "1880 %" = percent.1880, "Modern %" = percent.current) %>% 
+  arrange(., c("common", "uncommon", "rare", "very rare", "extinct")) #%>% 
+  #write.csv("outputs/percent_table.csv", row.names = F)
 
 
 
