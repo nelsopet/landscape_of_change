@@ -37,6 +37,7 @@ drive_download((drive_find(pattern = 'EAPH', n_max=1)), path = 'outputs/EAPH.jpg
 drive_download((drive_find(pattern = 'AMWO', n_max=1)), path = 'outputs/AMWO.jpg')
 drive_download((drive_find(pattern = 'BCNH', n_max=1)), path = 'outputs/BCNH.jpg')
 drive_download((drive_find(pattern = 'YBFL', n_max=1)), path = 'outputs/YBFL.jpg')
+drive_download((drive_find(pattern = 'HOSP', n_max=1)), path = 'outputs/HOSP.jpg')
 
 
 
@@ -254,6 +255,8 @@ EAPH <- bird.mod.locs %>%
 BLJA <- bird.mod.locs %>% 
   filter(bird.mod.locs$common.name=='Blue Jay')
 
+HOSP <- bird.mod.locs %>% 
+  filter(bird.mod.locs$common.name=='House Sparrow')
 
 #Get base map
 mdi.map <- get_stamenmap(
@@ -354,14 +357,20 @@ ggmap(mdi.map) +
   labs(x = "longitude", y = "latitude")
 
 
-#leaflet(BLJA) %>%
-#  addTiles() %>%  
-#  addCircleMarkers(
-#    radius = 5,
-#    color = 'blue',
-#    stroke = FALSE, fillOpacity = 1
-#  )
-
+#HOSP
+ggmap(mdi.map) +
+  geom_point(data=HOSP,
+             aes(x=longitude, y=latitude),
+             shape = 21,
+             size = 2.5,
+             color = 'black', 
+             fill = 'black',
+             stroke = 1,
+             alpha = 0.6) +
+  theme_classic(base_size = 14 ) +
+  ggtitle("House Sparrow Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x = "longitude", y = "latitude")
 
 
 
@@ -546,6 +555,30 @@ write_csv(bird.mod.locs, paste('outputs/species_plotting_data', '.csv', sep=''))
 #   draw_image("outputs/YBFL.jpg",  x = 0.34, y = 0, scale = .4) +
 #   draw_plot(map6)
 # dev.off()
+
+# #Figure 7
+# png(filename="outputs/house_sparrow_map.png", width=1200, height=600)
+# map6 <- ggmap(mdi.map) +
+#   geom_point(data=HOSP,
+#              aes(x=longitude, y=latitude),
+#              shape = 21,
+#              size = 2,
+#              color = 'black',
+#              fill = 'black',
+#              stroke = 1,
+#              alpha = 0.6) +
+#   theme_classic(base_size = 14 ) +
+#   theme(axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank(),
+#         panel.border=element_rect(colour = "black", fill=NA, size=1.5)) +
+#   labs(x = "", y = "")
+# ggdraw() +
+#   draw_image("outputs/HOSP.jpg",  x = 0.34, y = 0, scale = .4) +
+#   draw_plot(map6)
+# dev.off()
+
 # 
 # #Table 1
 # inc.table <- drastic.inc
