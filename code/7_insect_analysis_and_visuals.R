@@ -112,24 +112,29 @@ colnames(insect.counts.his) <- c('family', 'freq', 'period')
 insect.plot <- rbind(insect.counts.his, insect.counts.mod)
 
 #Create the ggplot
-png(filename="outputs/insect_freq_changes.png", width=5000, height=5000)
-
 insect.plot %>% 
   ggplot(aes(freq, family, fill = period)) +
   geom_bar(stat="identity", color="black", width=.91, position=position_dodge()) +
   ggtitle("Species Diversity by Family") + 
-  labs(y = "Family", x = "Number of Species") +
+  labs(y = "Family", x = "Number of species") +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 10), expand = c(0,0), limits = c(0,300)) +
   scale_fill_brewer(name="Legend", palette = 'Paired', direction = -1) +
-  theme_classic(base_size = 120) +
-  scale_y_discrete(limits=rev) +
-  theme(plot.title = element_text(hjust = 0.5, size = 160), axis.text = element_text(size=65, color = "black"), legend.key.size = unit(2, 'cm'))
+  theme_classic() +
+  scale_y_discrete(limits = rev) +
+  theme(plot.title = element_blank(), 
+        plot.margin = margin(.5,1.1,.5,.3, "cm"),
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 15, color = "black"),
+        legend.key.size = unit(1, 'cm'),
+        legend.text = element_text(size = 15, color = "black"),
+        legend.title = element_blank(),
+        legend.position = c(0.88, 0.85))
 
-dev.off()
+ggsave("outputs/test_plot.png", height = 11, width = 8.5)
 
 
 
-##Create dataframe for a table to see how many species from Proctor were recorded today
+##Create data frame for a table to see how many species from Proctor were recorded today
 #Left join by scientific name
 mod.proc <- left_join(insect.mod.analysis, insect.his.analysis, by = 'scientific.name') %>% 
   select('order.x','order.y','super.family.x','family.x','genus.x','scientific.name','common.name') %>% 
