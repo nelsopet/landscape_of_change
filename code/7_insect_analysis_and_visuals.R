@@ -6,9 +6,10 @@
 require(utils)
 require(tidyverse)
 require(ggplot2)
-require(dplyr)
 require(googledrive)
 require(foreign)
+require(ggforce)
+require(geomtextpath)
 
 select <- dplyr::select
 
@@ -139,7 +140,8 @@ ggsave("outputs/test_plot.png", height = 11, width = 8.5)
 mod.proc <- left_join(insect.mod.analysis, insect.his.analysis, by = 'scientific.name') %>% 
   select('order.x','order.y','super.family.x','family.x','genus.x','scientific.name','common.name') %>% 
   rename('super.family'='super.family.x','family'='family.x','genus'='genus.x') %>% 
-  arrange('super.family')
+  arrange('super.family') %>% 
+  as_tibble()
 
 
 
@@ -149,6 +151,7 @@ inat.sel <- insect.mod.analysis %>%
   filter(family=='Noctuidae' | family=="Sphingidae" | family=='Geometridae' | family=='Apidae' | 
            family=='Lycaenidae' | family=='Nymphalidae' | family=='Papilionidae' | family=='Pieridae' |
            family=='Hesperiidae')
+
 inat.sel <- inat.sel[order(inat.sel$family), ]
 
 #Proctor data
@@ -157,6 +160,7 @@ proc.sel <- insect.his.analysis %>%
            family=='Lycaenidae' | family=='Nymphalidae' | family=='Papilionidae' | family=='Pieridae' |
            family=='Hesperiidae') %>% 
   select(-c('name.synonyms','locality'))
+
 proc.sel <- proc.sel[order(proc.sel$family), ]
 
 #Left join
@@ -240,6 +244,42 @@ bombus.comb2 <- bombus.comb2 %>%
 
 
 
+#New comparison between historical and modern data figure
+circles <- data.frame(
+  historical = length(insect.his.analysis$scientific.name),
+  modern = length(insect.mod.analysis$scientific.name),
+  shared = 274)
+
+#Plot
+circles %>% 
+  ggplot() +
+  geom_circle(aes(x0 = 0, y0 = 0, r = ((historical - shared)/6)), size = 1, 
+              fill = "#FF9900", alpha = 0.7) +
+  geom_circle(aes(x0 = 145, y0 = 0, r = ((modern - shared))), size = 1, 
+              fill = "#99FFFF", alpha = 0.5) +
+  geom_textcurve(aes(x = -40, xend = 40, y = 200, yend = 200, label = "Historical"), 
+                 size = 7, fontface = "bold", curvature = -0.1, ncp = 20, spacing = 60) +
+  #geom_text(aes(label = "Historical", x = 0, y = 200), size = 7, fontface = "bold") +
+  geom_textcurve(aes(x = 180, xend = 230, y = 105, yend = 75, label = "Modern"), 
+                 size = 7, fontface = "bold", curvature = -0.18, ncp = 20, spacing = 80) +
+  #geom_text(aes(label = "Modern", x = 210, y = 110), size = 7, fontface = "bold") +
+  geom_text(aes(label = historical - shared, x = 0, y = 0), size = 6, fontface = "bold") +
+  geom_text(aes(label = shared, x = 140, y = 0), size = 6, fontface = "bold") +
+  geom_text(aes(label = modern - shared, x = 210, y = 0), size = 6, fontface = "bold") +
+  theme_bw() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.border = element_blank(),
+    panel.grid = element_blank()
+  )
+
+#Save plot
+ggsave("outputs/hist_mod_insect_comparison.png", height = 5, width = 5.8)
+
+
+
 
 #------------------------------------------------#
 ####     Writing Out Files for R Markdown     ####
@@ -253,6 +293,7 @@ write_csv(inat.sel, paste('outputs/inat_pollinator_data', '.csv', sep=''))
 write_csv(proc.sel, paste('outputs/proctor_pollinator_data', '.csv', sep=''))
 write_csv(sel.fam.all, paste('outputs/all_pollinator_data', '.csv', sep=''))
 write_csv(bombus.comb2, paste('outputs/bombus_table_data', '.csv', sep=''))
+
 
 
 
